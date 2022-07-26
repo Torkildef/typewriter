@@ -9,6 +9,7 @@ import InlineMenu from './InlineMenu.svelte';
 import Virtualized from './Virtualized.svelte';
 import Placeholder from './Placeholder.svelte';
 import MediumImages from './MediumImages.svelte';
+import TableTest from './TableTest.svelte';
 
 let url = globalHistory.location.pathname;
 const fullScreenRoutes = new Set(['/medium-images']);
@@ -37,6 +38,7 @@ globalHistory.listen(() => url = globalHistory.location.pathname);
         <a href="/virtualized" class="menu-item" class:current={url === '/virtualized'} use:link>Virtualized Rendering</a>
         <a href="/placeholder" class="menu-item" class:current={url === '/placeholder'} use:link>Placeholders</a>
         <a href="/medium-images" class="menu-item" class:current={url === '/medium-images'} use:link>Medium-like Images</a>
+        <a href="/table-test" class="menu-item" class:current={url === '/table-test'} use:link>Table Testing</a>
       </div>
       {/if}
 
@@ -49,6 +51,7 @@ globalHistory.listen(() => url = globalHistory.location.pathname);
         <Route path="/virtualized" component={Virtualized}/>
         <Route path="/placeholder" component={Placeholder}/>
         <Route path="/medium-images" component={MediumImages}/>
+        <Route path="/table-test" component={TableTest}/>
       </div>
     </div>
 

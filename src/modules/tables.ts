@@ -37,7 +37,11 @@ export function table(editor: Editor) {
   }
 
   function insertTable(rows: number, columns: number) {
+    // editor.setHTML("<table><td>hey</td></table>")
+    // console.log("hey")
 
+    editor.setHTML("<table>hey</table>", [1,2])
+    
   }
 
   function addColumn(direction: -1 | 1) {
