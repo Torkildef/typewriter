@@ -2,15 +2,103 @@
     import { Editor } from 'typewriter-editor';
     import Root from 'typewriter-editor/lib/Root.svelte';
     import Toolbar from 'typewriter-editor/lib/Toolbar.svelte';
+    import { h, VNode } from 'typewriter-editor';
     
     const editor = window.editor = new Editor();
 
-    function test(){
+  //   editor.select(0).insert('There‘s too many kids in this tub.\n' +
+  //   'There‘s too many elbows to scrub.\n' +
+  //   'I just washed a behind that I‘m sure wasn‘t mine.\n' +
+  //   'There‘s too many kids in this tub.'
+  // );
 
-        editor.modules.table.commands.insertTable(1,2)
 
-    }
-    
+  //   function test(){
+
+  //       editor.modules.table.commands.insertTable(1,2)
+
+  //   }
+
+  //   // Create a new block type for author attributions
+  // editor.typeset.lines.add({
+  //   name: 'attribution',
+  //   selector: 'h3.author',
+  //   render: (attributes, children) => {
+  //     return h('h3', { class: 'author' }, children);
+  //     // If we have JSX enabled in our app we can do this instead:
+  //     // return <h3 class="author">{children}</h3>
+  //   }
+  // });
+
+  // // I'm going to insert the text first, then format the lines after
+  // const header = 'There‘s too many kids in this tub.';
+  // const author = 'Shel Silverstein';
+  // editor.select(0).insert(header + '\n' + author + '\n');
+  // editor.select(0).formatLine({ header: 1 });
+  // editor.select(header.length + 1).formatLine({ attribution: true });
+
+
+  //     // Create a new block type for author attributions
+  // editor.typeset.lines.add({
+  //   name: 'table',
+  //   selector: 'table, tr',
+  //   render: (attributes, children) => {
+  //     console.log("CHILD = ", children[0].substring(0, 4))
+  //     console.log(h('table', { class: 'klasseForTable' }, children))
+  //     return h('table', { class: 'klasseForTable' }, children);
+  //     // If we have JSX enabled in our app we can do this instead:
+  //     // return <h3 class="author">{children}</h3>
+  //   }
+  // });
+
+  //       // Create a new block type for author attributions
+  // editor.typeset.lines.add({
+  //   name: 'table',
+  //   selector: 'table, tr',
+  //   render: (attributes, children) => {
+  //     return h('table', { class: 'klasseForTable' }, children);
+  //     // If we have JSX enabled in our app we can do this instead:
+  //     // return <h3 class="author">{children}</h3>
+  //   }
+  // });
+
+  // I'm going to insert the text first, then format the lines after
+  // const tabletest = '<tr>her skal det være table rundt<tr>';
+  // editor.select(0).insert(tabletest + '\n');
+  // editor.select(0).formatLine({ table: true });
+  // editor.select(header.length + 1).formatLine({ attribution: true });
+  
+  // editor.setHTML(
+  //   '<table>'+
+  //     '<tr>'+
+  //       '<td>Emil</td>'+
+  //       '<td>Tobias</td>'+
+  //       '<td>Linus</td>'+
+  //     '</tr>'+
+  //   '</table>')
+
+  // editor.setHTML(
+  //   '<ul>'+
+  //     '<li>Coffee</li>'+
+  //     '<li>Tea</li>'+
+  //     '<li>Milk</li>'+
+  //   '</ul>'
+  //   )
+
+    editor.setHTML(
+    '<table>'+
+        '<tr>Emil</tr>'+
+        '<tr>Tobias</tr>'+
+        '<tr>Linus</tr>'+
+    '</table>')
+
+  
+  console.log(editor.getText()); // '\n'
+  console.log(editor.getHTML()); // '<p><br></p>'
+  console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
+  console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
+
+  console.log(editor.typeset.lines)
     </script>
     
     <div class="description">
@@ -51,21 +139,23 @@
           class="toolbar-button material-icons"
           disabled={!active.redo}
           on:click={commands.redo}>redo</button>
-
-        <button
+        
+        <!-- <button
             class="toolbar-button material-icons"
             class:active={active.italic}
-            on:click={test}>?</button>
+            on:click={test}>?</button> -->
         </div>
 
 
     </Toolbar>
     
     <Root {editor} class="text-content">
-      <h2>Typewriter</h2>
+
+
+
+
 
     </Root>
-    
     <style>
     .toolbar {
       display: flex;
