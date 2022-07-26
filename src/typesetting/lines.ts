@@ -64,6 +64,7 @@ export const list = line({
     'Mod+Space': 'toggleCheck',
   },
   fromDom(node: HTMLElement) {
+    console.log(node)
     let indent = -1, parent = node.parentNode;
     const list = node.hasAttribute('data-checked') ? 'check' : parent && parent.nodeName === 'OL' ? 'ordered' : 'bullet';
     while (parent) {
@@ -217,4 +218,46 @@ export const hr = line({
     editor.update(change);
   },
   render: () => h('hr'),
+});
+
+export const tableTest = line({
+  name: 'table',
+  selector: 'table > tr, table > t',
+
+  fromDom(node: HTMLElement) {
+    console.log(node)
+    // let indent = -1, parent = node.parentNode;
+    // const list = node.hasAttribute('data-checked') ? 'check' : parent && parent.nodeName === 'OL' ? 'ordered' : 'bullet';
+    // while (parent) {
+    //   if (/^UL|OL$/.test(parent.nodeName)) indent++;
+    //   else if (parent.nodeName !== 'LI') break;
+    //   parent = parent.parentNode;
+    // }
+    // if (!indent && node.className.startsWith('ql-indent-')) {
+    //   // Support pasting from quilljs content
+    //   indent = parseInt(node.className.replace('ql-indent-', ''));
+    // }
+    // const attr: { list: string, checked?: boolean, indent?: number } = { list };
+    // if (indent) attr.indent = indent;
+    // if (node.getAttribute('data-checked') === 'true') attr.checked = true;
+    return {table:true};
+  },
+  
+  // renderMultiple: (lists, editor, forHTML) => {
+  //   const topLevelChildren: VNode[] = [];
+  //   const levels: VNode[] = [];
+  //   console.log(lists)
+
+  //   lists.forEach(([ attributes, children, id ]) => {
+  //     const type = 'tr';
+  //     console.log(attributes.list)
+  //   })
+  //   return topLevelChildren[0];
+
+  // }
+  render: (attributes, children) => {
+    return h('table', { class: 'klasseForTable' }, children);
+    // If we have JSX enabled in our app we can do this instead:
+    // return <h3 class="author">{children}</h3>
+  }
 });
