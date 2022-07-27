@@ -222,7 +222,7 @@ export const hr = line({
 
 export const tableTest = line({
   name: 'table',
-  selector: 'table > tr, table > t',
+  selector: 'table, tr',
 
   fromDom(node: HTMLElement) {
     console.log(node)
@@ -256,6 +256,8 @@ export const tableTest = line({
 
   // }
   render: (attributes, children) => {
+  // return h('table', { class: 'klasseForTable' }, [h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "Emil"),h('td', { class: 'klasseForTd' }, "Tobias"), h('td', { class: 'klasseForTd' }, "Linus")]),h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "16"),h('td', { class: 'klasseForTd' }, "14"), h('td', { class: 'klasseForTd' }, "10")])]);
+
     return h('table', { class: 'klasseForTable' }, children);
     // If we have JSX enabled in our app we can do this instead:
     // return <h3 class="author">{children}</h3>

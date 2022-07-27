@@ -191,5 +191,10 @@
     .header3 {
       font-size: 18px;
     }
+
+    :global(table, tr, td) {
+      border-collapse: collapse;
+      border:1px solid black;
+}
     </style>
     
