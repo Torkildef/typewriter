@@ -79,6 +79,7 @@ export const list = line({
     const attr: { list: string, checked?: boolean, indent?: number } = { list };
     if (indent) attr.indent = indent;
     if (node.getAttribute('data-checked') === 'true') attr.checked = true;
+    console.log(attr)
     return attr;
   },
   nextLineAttributes(attributes) {
@@ -90,7 +91,7 @@ export const list = line({
     const topLevelChildren: VNode[] = [];
     const levels: VNode[] = [];
     // e.g. levels = [ul, ul]
-
+    console.log(lists)
     lists.forEach(([ attributes, children, id ]) => {
       const type = attributes.list === 'ordered' ? 'ol' : 'ul';
       const index = attributes.indent as number || 0;
@@ -219,10 +220,10 @@ export const hr = line({
   },
   render: () => h('hr'),
 });
-
+import { LineData } from '../typesetting';
 export const tableTest = line({
   name: 'table',
-  selector: 'table, tr',
+  selector: 'table > tbody > tr > td, table > tbody > tr > th',
 
   fromDom(node: HTMLElement) {
     console.log(node)
@@ -242,24 +243,91 @@ export const tableTest = line({
     // if (node.getAttribute('data-checked') === 'true') attr.checked = true;
     return {table:true};
   },
-  
-  // renderMultiple: (lists, editor, forHTML) => {
-  //   const topLevelChildren: VNode[] = [];
-  //   const levels: VNode[] = [];
-  //   console.log(lists)
+  // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
+  // renderMultiple(lines) {
+  //   const first = lines[0][0].table;
+  //   let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
+  //   const table = h('table', null, [ row ]);
 
-  //   lists.forEach(([ attributes, children, id ]) => {
-  //     const type = 'tr';
-  //     console.log(attributes.list)
-  //   })
-  //   return topLevelChildren[0];
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const [ attributes, children, id ] = lines[i];
+  //     if (row.key !== attributes.table) {
+  //       row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
+  //       table.children.push(row);
+  //     }
+  //     row.children.push(h('td', { key: id }));
+  //   }
 
-  // }
-  render: (attributes, children) => {
-  // return h('table', { class: 'klasseForTable' }, [h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "Emil"),h('td', { class: 'klasseForTd' }, "Tobias"), h('td', { class: 'klasseForTd' }, "Linus")]),h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "16"),h('td', { class: 'klasseForTd' }, "14"), h('td', { class: 'klasseForTd' }, "10")])]);
+  //   return table;
+  // },
+  renderMultiple: (lines : LineData[], editor, forHTML) => {
 
-    return h('table', { class: 'klasseForTable' }, children);
-    // If we have JSX enabled in our app we can do this instead:
-    // return <h3 class="author">{children}</h3>
+    console.log(lines)
+    let row = h('tr', { key: 'tr' });
+    const table = h('table', null, [ row ]);
+
+    for (let i = 1; i < lines.length; i++) {
+      const [ attributes, children, id ] = lines[i];
+      if (row.key !== attributes.table) {
+        row = h('td', { key: 'td' });
+        table.children.push(row);
+      }
+      row.children.push(h('td', { key: id }));
+    }
+
+    return table;
+    // console.log(lines)
+    // const topLevelChildren: VNode[] = [];
+    // const levels: VNode[] = [];
+    // console.log(lines)
+
+    // lines.forEach(([ attributes, children, id ]) => {
+
+    //   console.log(attributes)
+    //   const type = 'table';
+    //   const index = attributes.indent as number || 0;
+    //   let props: Props = { key: id };
+
+    //   const item = applyDecorations(h('tr', props, children), attributes);
+
+    //   while (index >= levels.length){
+    //     const newLevel = h(type, { start: attributes.start, type: attributes.type, key: `${id}-outer` });
+    //     const childrenArray = levels.length ? levels[levels.length - 1].children : topLevelChildren;
+    //     const lastChild = childrenArray[childrenArray.length - 1];
+
+    //     if (typeof lastChild === 'object' && lastChild.type === 'tr') {
+    //       if (forHTML) {
+    //         // Correct HTML
+    //         lastChild.children.push(newLevel);
+    //       } else {
+    //         // Technically incorrect HTML needed to fix selection bug: when clicking to the right of a list item with a
+    //         // sub-item, the selection goes to the start of the line instead of the end
+    //         childrenArray.push(newLevel);
+    //       }
+    //     } else {
+    //       childrenArray.push(newLevel);
+    //     }
+    //     levels.push(newLevel);
+    //   }
+
+    //   // if (!compareLists(levels[index], type, attributes)) {
+    //   //   const newLevel = h(type, { start: attributes.start, type: attributes.type });
+    //   //   const childrenArray = index ? levels[index - 1].children : topLevelChildren;
+    //   //   childrenArray.push(newLevel);
+    //   //   levels[index] = newLevel;
+    //   // }
+    //   levels[index].children.push(item);
+
+    //   levels.length = index + 1;
+    // });
+    // return topLevelChildren[0];
+
   }
+  // render: (attributes, children) => {
+  // // return h('table', { class: 'klasseForTable' }, [h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "Emil"),h('td', { class: 'klasseForTd' }, "Tobias"), h('td', { class: 'klasseForTd' }, "Linus")]),h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "16"),h('td', { class: 'klasseForTd' }, "14"), h('td', { class: 'klasseForTd' }, "10")])]);
+
+  //   return h('table', { class: 'klasseForTable' }, children);
+  //   // If we have JSX enabled in our app we can do this instead:
+  //   // return <h3 class="author">{children}</h3>
+  // }
 });

@@ -68,14 +68,19 @@
   // editor.select(0).formatLine({ table: true });
   // editor.select(header.length + 1).formatLine({ attribution: true });
   
-  // editor.setHTML(
-  //   '<table>'+
-  //     '<tr>'+
-  //       '<td>Emil</td>'+
-  //       '<td>Tobias</td>'+
-  //       '<td>Linus</td>'+
-  //     '</tr>'+
-  //   '</table>')
+  editor.setHTML(
+    '<table>'+
+      '<tr>'+
+        '<td>Emil</td>'+
+        '<td>Tobias</td>'+
+        '<td>Linus</td>'+
+      '</tr>'+
+      '<tr>'+
+        '<td>Emil</td>'+
+        '<td>Tobias</td>'+
+        '<td>Linus</td>'+
+      '</tr>'+
+    '</table>')
 
   // editor.setHTML(
   //   '<ul>'+
@@ -85,12 +90,12 @@
   //   '</ul>'
   //   )
 
-    editor.setHTML(
-    '<table>'+
-        '<tr>Emil</tr>'+
-        '<tr>Tobias</tr>'+
-        '<tr>Linus</tr>'+
-    '</table>')
+    // editor.setHTML(
+    // '<table>'+
+    //     '<tr>Emil</tr>'+
+    //     '<tr>Tobias</tr>'+
+    //     '<tr>Linus</tr>'+
+    // '</table>')
 
   
   console.log(editor.getText()); // '\n'
@@ -100,6 +105,12 @@
 
   console.log(editor.typeset.lines)
     </script>
+
+<table>
+    <td>Alfreds Futterkiste</td>
+    <td>Maria Anders</td>
+    <td>Germany</td>
+</table>
     
     <div class="description">
       <h1>Toolbar</h1>
