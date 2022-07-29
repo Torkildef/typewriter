@@ -114,7 +114,6 @@
     //     '<tr>Tobias</tr>'+
     //     '<tr>Linus</tr>'+
     // '</table>')
-
   
   console.log(editor.getText()); // '\n'
   console.log(editor.getHTML()); // '<p><br></p>'
@@ -221,7 +220,8 @@
       font-size: 18px;
     }
 
-    :global(table, tr, td) {
+    :global(table, tr, td, th) {
+
       border-collapse: collapse;
       border:1px solid black;
 }

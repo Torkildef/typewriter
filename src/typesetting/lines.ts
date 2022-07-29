@@ -221,15 +221,13 @@ export const hr = line({
   },
   render: () => h('hr'),
 });
-import { LineData } from '../typesetting';
-import { Editor } from 'typewriter-editor';
+
+
 export const tableTest = line({
   name: 'table',
-  selector: 'table td, table th, tr',
-
+  selector: 'table, td, table th, tr',
 
   fromDom(node: HTMLElement) {
-    
     console.log(node.nodeName)
     if(node.nodeName == "TD"){
       return {table: 'footer'};
@@ -242,40 +240,8 @@ export const tableTest = line({
     if(node.nodeName == "TH"){
       return {table: 'header'};
     }
-
-    // if(node.nodeName == "H")
-    // let indent = -1, parent = node.parentNode;
-    // const list = node.hasAttribute('data-checked') ? 'check' : parent && parent.nodeName === 'OL' ? 'ordered' : 'bullet';
-    // while (parent) {
-    //   if (/^UL|OL$/.test(parent.nodeName)) indent++;
-    //   else if (parent.nodeName !== 'LI') break;
-    //   parent = parent.parentNode;
-    // }
-    // if (!indent && node.className.startsWith('ql-indent-')) {
-    //   // Support pasting from quilljs content
-    //   indent = parseInt(node.className.replace('ql-indent-', ''));
-    // }
-    // const attr: { list: string, checked?: boolean, indent?: number } = { list };
-    // if (indent) attr.indent = indent;
-    // if (node.getAttribute('data-checked') === 'true') attr.checked = true;
   },
-  // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
-  // renderMultiple(lines) {
-  //   const first = lines[0][0].table;
-  //   let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
-  //   const table = h('table', null, [ row ]);
-
-  //   for (let i = 0; i < lines.length; i++) {
-  //     const [ attributes, children, id ] = lines[i];
-  //     if (row.key !== attributes.table) {
-  //       row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
-  //       table.children.push(row);
-  //     }
-  //     row.children.push(h('td', { key: id }));
-  //   }
-
-  //   return table;
-  // },
+  shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lines, editor, forHTML) => {
       const first = lines[0][0].table;
       let row = h('tr', { key: first });
@@ -297,102 +263,4 @@ export const tableTest = line({
       }
       return table;
     },
-  //   console.log(lines)
-
-  //   const table = h('table', null, [])
-  //   lines.forEach(([ attributes, children, id ]) => {
-  //     table.children.push(h('td', null, children)) 
-  //   })
-  //   return table
-  // }
-  //   const topLevelChildren: VNode[] = [];
-  //   let row = h('tr', null);
-  //   const table = h('table', null, []);
-
-  //   for (let i = 0; i < lines.length; i++) {
-  //     const [ attributes, children, id ] = lines[i];
-  //     let props: Props = { key: id };
-
-  //     if(attributes.row){
-        
-  //       row = h('tr', props, [ ]);
-  //       table.children.push(row)
-  //     }
-  //     else{
-  //       const item = applyDecorations(h('td', props, children), attributes);
-  //       row.children.push(item)
-
-  //     }
-  //   }
-  //   console.log(table)
-  //   return table;
-  // }
-
-    // console.log(lines)
-    // let row = h('tr', { key: 'tr' });
-    // const table = h('table', null, [ row ]);
-
-    // for (let i = 1; i < lines.length; i++) {
-    //   const [ attributes, children, id ] = lines[i];
-    //   if (row.key !== attributes.table) {
-    //     row = h('td', { key: 'td' });
-    //     table.children.push(row);
-    //   }
-    //   row.children.push(h('td', { key: id }));
-    // }
-
-    // return table;
-    // console.log(lines)
-    // console.log(editor)
-    // console.log(forHTML)
-    // const topLevelChildren: VNode[] = [];
-    // const levels: VNode[] = [];
-    // lines.forEach(([ attributes, children, id ]) => {
-    //   const type = 'table';
-    //   const index = 0;
-    //   let props: Props = { key: id };
-
-    //   const item = applyDecorations(h('td', props, children), attributes);
-    //   console.log("her", levels.length)
-    //   while (index >= levels.length){
-    //     console.log("her", levels)
-    //     const newLevel = h(type, { start: attributes.start, type: attributes.type, key: `${id}-outer` });
-    //     const childrenArray = levels.length ? levels[levels.length - 1].children : topLevelChildren;
-    //     const lastChild = childrenArray[childrenArray.length - 1];
-
-    //     if (typeof lastChild === 'object' && lastChild.type === 'td') {
-    //       if (forHTML) {
-    //         // Correct HTML
-    //         lastChild.children.push(newLevel);
-    //       } else {
-    //         // Technically incorrect HTML needed to fix selection bug: when clicking to the right of a list item with a
-    //         // sub-item, the selection goes to the start of the line instead of the end
-    //         childrenArray.push(newLevel);
-    //       }
-    //     } else {
-    //       childrenArray.push(newLevel);
-    //     }
-    //     levels.push(newLevel);
-    //   }
-
-    //   // if (!compareLists(levels[index], type, attributes)) {
-    //   //   const newLevel = h(type, { start: attributes.start, type: attributes.type });
-    //   //   const childrenArray = index ? levels[index - 1].children : topLevelChildren;
-    //   //   childrenArray.push(newLevel);
-    //   //   levels[index] = newLevel;
-    //   // }
-    //   levels[index].children.push(item);
-
-    //   levels.length = index + 1;
-    // });
-    // return topLevelChildren[0];
-
-  // }
-  // render: (attributes, children) => {
-  // // return h('table', { class: 'klasseForTable' }, [h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "Emil"),h('td', { class: 'klasseForTd' }, "Tobias"), h('td', { class: 'klasseForTd' }, "Linus")]),h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "16"),h('td', { class: 'klasseForTd' }, "14"), h('td', { class: 'klasseForTd' }, "10")])]);
-
-  //   return h('table', { class: 'klasseForTable' }, children);
-  //   // If we have JSX enabled in our app we can do this instead:
-  //   // return <h3 class="author">{children}</h3>
-  // }
 });
