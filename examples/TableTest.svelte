@@ -75,16 +75,36 @@
 '<th>Person 1</th>'+
 '<th>Person 2</th>'+
 '<th>Person 3</th>'+
+'<th>Person 4</th>'+
+'<th>Person 5</th>'+
 '</tr>'+
 '<tr>'+
 '<td>Emil</td>'+
 '<td>Tobias</td>'+
 '<td>Linus</td>'+
+'<td>Bob</td>'+
+'<td>Alice</td>'+
 '</tr>'+
 '<tr>'+
 '<td>16</td>'+
 '<td>14</td>'+
 '<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
 '</tr>'+
 '</table>'
       // '<tr>'+
