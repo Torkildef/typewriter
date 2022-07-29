@@ -69,18 +69,36 @@
   // editor.select(header.length + 1).formatLine({ attribution: true });
   
   editor.setHTML(
-    '<table>'+
-      '<tr>'+
-        '<td>Emil</td>'+
-        '<td>Tobias</td>'+
-        '<td>Linus</td>'+
-      '</tr>'+
-      '<tr>'+
-        '<td>Emil</td>'+
-        '<td>Tobias</td>'+
-        '<td>Linus</td>'+
-      '</tr>'+
-    '</table>')
+'Table:' +
+'<table>'+
+'<tr>'+
+'<th>Person 1</th>'+
+'<th>Person 2</th>'+
+'<th>Person 3</th>'+
+'</tr>'+
+'<tr>'+
+'<td>Emil</td>'+
+'<td>Tobias</td>'+
+'<td>Linus</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'</tr>'+
+'</table>'
+      // '<tr>'+
+      //   '<td>Emil</td>'+
+      //   '<td>Tobias</td>'+
+      //   '<td>Linus</td>'+
+      // '</tr>'+
+    // '</table>'
+    //     '<ul>'+
+    //   '<li>Coffee</li>'+
+    //   '<li>Tea</li>'+
+    //   '<li>Milk</li>'+
+    // '</ul>'
+    )
 
   // editor.setHTML(
   //   '<ul>'+

@@ -41,13 +41,15 @@ export const list = line({
   name: 'list',
   selector: 'ul > li, ol > li',
   indentable: true,
-  commands: editor => ({
+  commands: editor => (
+    {
     bulletList: () => editor.toggleLineFormat({ list: 'bullet' }),
     orderedList: () => editor.toggleLineFormat({ list: 'ordered' }),
     checkList: () => editor.toggleLineFormat({ list: 'check' }),
     indent: () => editor.indent(),
     outdent: () => editor.outdent(),
     toggleCheck: (id: string) => {
+      console.log("hey1111111")
       const line = typeof id === 'string'
         ? editor.doc.getLineBy(id)
         : editor.doc.selection
@@ -79,7 +81,7 @@ export const list = line({
     const attr: { list: string, checked?: boolean, indent?: number } = { list };
     if (indent) attr.indent = indent;
     if (node.getAttribute('data-checked') === 'true') attr.checked = true;
-    console.log(attr)
+    
     return attr;
   },
   nextLineAttributes(attributes) {
@@ -88,10 +90,10 @@ export const list = line({
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lists, editor, forHTML) => {
+    console.log(lists)
     const topLevelChildren: VNode[] = [];
     const levels: VNode[] = [];
     // e.g. levels = [ul, ul]
-    console.log(lists)
     lists.forEach(([ attributes, children, id ]) => {
       const type = attributes.list === 'ordered' ? 'ol' : 'ul';
       const index = attributes.indent as number || 0;
@@ -112,7 +114,6 @@ export const list = line({
         };
       }
       const item = applyDecorations(h('li', props, children), attributes);
-
       while (index >= levels.length) {
         const newLevel = h(type, { start: attributes.start, type: attributes.type, key: `${id}-outer` });
         const childrenArray = levels.length ? levels[levels.length - 1].children : topLevelChildren;
@@ -221,12 +222,28 @@ export const hr = line({
   render: () => h('hr'),
 });
 import { LineData } from '../typesetting';
+import { Editor } from 'typewriter-editor';
 export const tableTest = line({
   name: 'table',
-  selector: 'table > tbody > tr > td, table > tbody > tr > th',
+  selector: 'table td, table th, tr',
+
 
   fromDom(node: HTMLElement) {
-    console.log(node)
+    
+    console.log(node.nodeName)
+    if(node.nodeName == "TD"){
+      return {table: 'footer'};
+    }
+
+    if(node.nodeName == "TR"){
+      return {table:'row'};
+    }
+
+    if(node.nodeName == "TH"){
+      return {table: 'header'};
+    }
+
+    // if(node.nodeName == "H")
     // let indent = -1, parent = node.parentNode;
     // const list = node.hasAttribute('data-checked') ? 'check' : parent && parent.nodeName === 'OL' ? 'ordered' : 'bullet';
     // while (parent) {
@@ -241,7 +258,6 @@ export const tableTest = line({
     // const attr: { list: string, checked?: boolean, indent?: number } = { list };
     // if (indent) attr.indent = indent;
     // if (node.getAttribute('data-checked') === 'true') attr.checked = true;
-    return {table:true};
   },
   // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   // renderMultiple(lines) {
@@ -260,42 +276,91 @@ export const tableTest = line({
 
   //   return table;
   // },
-  renderMultiple: (lines : LineData[], editor, forHTML) => {
-
-    console.log(lines)
-    let row = h('tr', { key: 'tr' });
-    const table = h('table', null, [ row ]);
-
-    for (let i = 1; i < lines.length; i++) {
-      const [ attributes, children, id ] = lines[i];
-      if (row.key !== attributes.table) {
-        row = h('td', { key: 'td' });
-        table.children.push(row);
+  renderMultiple: (lines, editor, forHTML) => {
+      const first = lines[0][0].table;
+      let row = h('tr', { key: first });
+      const table = h('table', null, [ ]);
+  
+      for (let i = 0; i < lines.length; i++) {
+        const [ attributes, children, id ] = lines[i];
+        if (attributes.table === 'row') {
+          row = h('tr', { key: attributes.table });
+          console.log("pushing")
+          table.children.push(row);
+        }
+        else if(attributes.table === 'footer'){
+          row.children.push(h('td', { key: id }, children));
+        }
+        else if(attributes.table === 'header'){
+          row.children.push(h('th', { key: id }, children));
+        }
       }
-      row.children.push(h('td', { key: id }));
-    }
+      return table;
+    },
+  //   console.log(lines)
 
-    return table;
+  //   const table = h('table', null, [])
+  //   lines.forEach(([ attributes, children, id ]) => {
+  //     table.children.push(h('td', null, children)) 
+  //   })
+  //   return table
+  // }
+  //   const topLevelChildren: VNode[] = [];
+  //   let row = h('tr', null);
+  //   const table = h('table', null, []);
+
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const [ attributes, children, id ] = lines[i];
+  //     let props: Props = { key: id };
+
+  //     if(attributes.row){
+        
+  //       row = h('tr', props, [ ]);
+  //       table.children.push(row)
+  //     }
+  //     else{
+  //       const item = applyDecorations(h('td', props, children), attributes);
+  //       row.children.push(item)
+
+  //     }
+  //   }
+  //   console.log(table)
+  //   return table;
+  // }
+
     // console.log(lines)
+    // let row = h('tr', { key: 'tr' });
+    // const table = h('table', null, [ row ]);
+
+    // for (let i = 1; i < lines.length; i++) {
+    //   const [ attributes, children, id ] = lines[i];
+    //   if (row.key !== attributes.table) {
+    //     row = h('td', { key: 'td' });
+    //     table.children.push(row);
+    //   }
+    //   row.children.push(h('td', { key: id }));
+    // }
+
+    // return table;
+    // console.log(lines)
+    // console.log(editor)
+    // console.log(forHTML)
     // const topLevelChildren: VNode[] = [];
     // const levels: VNode[] = [];
-    // console.log(lines)
-
     // lines.forEach(([ attributes, children, id ]) => {
-
-    //   console.log(attributes)
     //   const type = 'table';
-    //   const index = attributes.indent as number || 0;
+    //   const index = 0;
     //   let props: Props = { key: id };
 
-    //   const item = applyDecorations(h('tr', props, children), attributes);
-
+    //   const item = applyDecorations(h('td', props, children), attributes);
+    //   console.log("her", levels.length)
     //   while (index >= levels.length){
+    //     console.log("her", levels)
     //     const newLevel = h(type, { start: attributes.start, type: attributes.type, key: `${id}-outer` });
     //     const childrenArray = levels.length ? levels[levels.length - 1].children : topLevelChildren;
     //     const lastChild = childrenArray[childrenArray.length - 1];
 
-    //     if (typeof lastChild === 'object' && lastChild.type === 'tr') {
+    //     if (typeof lastChild === 'object' && lastChild.type === 'td') {
     //       if (forHTML) {
     //         // Correct HTML
     //         lastChild.children.push(newLevel);
@@ -322,7 +387,7 @@ export const tableTest = line({
     // });
     // return topLevelChildren[0];
 
-  }
+  // }
   // render: (attributes, children) => {
   // // return h('table', { class: 'klasseForTable' }, [h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "Emil"),h('td', { class: 'klasseForTd' }, "Tobias"), h('td', { class: 'klasseForTd' }, "Linus")]),h('tr', { class: 'klasseForTr' }, [h('td', { class: 'klasseForTd' }, "16"),h('td', { class: 'klasseForTd' }, "14"), h('td', { class: 'klasseForTd' }, "10")])]);
 
