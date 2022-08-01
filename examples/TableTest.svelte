@@ -1,5 +1,5 @@
 <script>
-    import { Editor } from 'typewriter-editor';
+    import { Delta, Editor } from 'typewriter-editor';
     import Root from 'typewriter-editor/lib/Root.svelte';
     import Toolbar from 'typewriter-editor/lib/Toolbar.svelte';
     import { h, VNode } from 'typewriter-editor';
@@ -12,24 +12,18 @@
   //   'There‘s too many kids in this tub.'
   // );
 
-
-  //   function test(){
-
-  //       editor.modules.table.commands.insertTable(1,2)
-
-  //   }
-
+  
   //   // Create a new block type for author attributions
   // editor.typeset.lines.add({
-  //   name: 'attribution',
-  //   selector: 'h3.author',
+    //   name: 'attribution',
+    //   selector: 'h3.author',
   //   render: (attributes, children) => {
   //     return h('h3', { class: 'author' }, children);
   //     // If we have JSX enabled in our app we can do this instead:
   //     // return <h3 class="author">{children}</h3>
   //   }
   // });
-
+  
   // // I'm going to insert the text first, then format the lines after
   // const header = 'There‘s too many kids in this tub.';
   // const author = 'Shel Silverstein';
@@ -56,69 +50,169 @@
   //   name: 'table',
   //   selector: 'table, tr',
   //   render: (attributes, children) => {
-  //     return h('table', { class: 'klasseForTable' }, children);
+    //     return h('table', { class: 'klasseForTable' }, children);
   //     // If we have JSX enabled in our app we can do this instead:
   //     // return <h3 class="author">{children}</h3>
   //   }
   // });
-
+  
   // I'm going to insert the text first, then format the lines after
   // const tabletest = '<tr>her skal det være table rundt<tr>';
   // editor.select(0).insert(tabletest + '\n');
   // editor.select(0).formatLine({ table: true });
   // editor.select(header.length + 1).formatLine({ attribution: true });
   
+      function test(){
+        let row = prompt("Antall rader");
+        let colum = prompt("Antall kolonner");
+        editor.commands.insertTable(row,colum)
+    //     editor.setHTML(
+    // 'Table:' +
+    // '<table>'+
+    // '<tr>'+
+    // '<th>Person 1</th>'+
+    // '<th>Person 2</th>'+
+    // '<th>Person 3</th>'+
+    // '<th>Person 4</th>'+
+    // '<th>Person 5</th>'+
+    // '</tr>'+
+    // '<tr>'+
+    // '<td>Emil</td>'+
+    // '<td>Tobias</td>'+
+    // '<td>Linus</td>'+
+    // '<td>Bob</td>'+
+    // '<td>Alice</td>'+
+    // '</tr>'+
+    // '<tr>'+
+    // '<td>16</td>'+
+    // '<td>14</td>'+
+    // '<td>10</td>'+
+    // '<td>40</td>'+
+    // '<td>45</td>'+
+    // '</tr>'+
+    // '<tr>'+
+    // '<td>16</td>'+
+    // '<td>14</td>'+
+    // '<td>10</td>'+
+    // '<td>40</td>'+
+    // '<td>45</td>'+
+    // '</tr>'+
+    // '<tr>'+
+    // '<td>16</td>'+
+    // '<td>14</td>'+
+    // '<td>10</td>'+
+    // '<td>40</td>'+
+    // '<td>45</td>'+
+    // '</tr>'+
+    // '</table>'
+    // )
+    //     editor.setHTML(
+    //     '<ul>'+
+    //   '<li>Coffee</li>'+
+    //   '<li>Tea</li>'+
+    //   '<li>Milk</li>'+
+    // '</ul>')
+        // const delta = new Delta([
+        // { insert: 'hey'},
+        //   // { insert: '\n', attributes: {table: 'footer'} },
+        //   // { insert: 'Hey'},
+        //   // { insert: '\n', attributes: {table: 'footer'} },
+        //   // { insert: 'Hey'},
+        //   // { insert: '\n', attributes: {table: 'footer'} },
+        //   // { insert: 'Hey'}
+        // ])
+
+        // const delta2 = new Delta([
+        //   { insert: 'hey'},
+        // ])
+        // console.log(delta)
+        // console.log(editor.commands)
+        // editor.modules.rendering.render()
+        // editor.setDelta(delta)
+        // // console.log(editor.getActive().table)
+        // // if(editor.getActive().table){
+        // //   let lastTD = editor.doc.selection[0]
+        // //   while(editor.select(lastTD).getActive().table && lastTD<500){
+        // //     console.log(lastTD)
+        // //     console.log(editor.select(lastTD).getActive().table)
+        // //     lastTD += 1;
+        // //   }
+        //   console.log(editor.getActive().table)
+        //   console.log(lastTD)
+        //   let word = 'ord'
+        //   editor.insert('\n', {table:'row'}, lastTD)
+        //   lastTD+=1
+        //   editor.select(lastTD).insert('\n', {table:'footer'})
+        //   lastTD+=1
+        //   editor.select(lastTD).insert(word, null)
+        //   lastTD += word.length
+        //   editor.select(lastTD).insert('\n', {table:'footer'})
+        //   lastTD+=1
+        //   editor.select(lastTD).insert(word, null)
+        //   lastTD += word.length
+        //   editor.select(lastTD).insert('\n', {table:'footer'})
+        //   lastTD+=1
+        //   editor.select(lastTD).insert(word, null)
+        // }
+      }
+  
   editor.setHTML(
-'Table:' +
-'<table>'+
-'<tr>'+
-'<th>Person 1</th>'+
-'<th>Person 2</th>'+
-'<th>Person 3</th>'+
-'<th>Person 4</th>'+
-'<th>Person 5</th>'+
-'</tr>'+
-'<tr>'+
-'<td>Emil</td>'+
-'<td>Tobias</td>'+
-'<td>Linus</td>'+
-'<td>Bob</td>'+
-'<td>Alice</td>'+
-'</tr>'+
-'<tr>'+
-'<td>16</td>'+
-'<td>14</td>'+
-'<td>10</td>'+
-'<td>40</td>'+
-'<td>45</td>'+
-'</tr>'+
-'<tr>'+
-'<td>16</td>'+
-'<td>14</td>'+
-'<td>10</td>'+
-'<td>40</td>'+
-'<td>45</td>'+
-'</tr>'+
-'<tr>'+
-'<td>16</td>'+
-'<td>14</td>'+
-'<td>10</td>'+
-'<td>40</td>'+
-'<td>45</td>'+
-'</tr>'+
-'</table>'
-      // '<tr>'+
-      //   '<td>Emil</td>'+
-      //   '<td>Tobias</td>'+
-      //   '<td>Linus</td>'+
-      // '</tr>'+
+    'Table:' +
+    '<table>'+
+    '<tr>'+
+    '<th>Person 1</th>'+
+    '<th>Person 2</th>'+
+    '<th>Person 3</th>'+
+    '<th>Person 4</th>'+
+    '<th>Person 5</th>'+
+    '</tr>'+
+    '<tr>'+
+    '<td>Emil</td>'+
+    '<td>Tobias</td>'+
+    '<td>Linus</td>'+
+    '<td>Bob</td>'+
+    '<td>Alice</td>'+
+    '</tr>'+
+    '<tr>'+
+    '<td>16</td>'+
+    '<td>14</td>'+
+    '<td>10</td>'+
+    '<td>40</td>'+
+    '<td>45</td>'+
+    '</tr>'+
+    '<tr>'+
+    '<td>16</td>'+
+    '<td>14</td>'+
+    '<td>10</td>'+
+    '<td>40</td>'+
+    '<td>45</td>'+
+    '</tr>'+
+    '<tr>'+
+    '<td>16</td>'+
+    '<td>14</td>'+
+    '<td>10</td>'+
+    '<td>40</td>'+
+    '<td>45</td>'+
+    '</tr>'+
+    '</table>'
+    )
+    console.log(editor.getText()); // '\n'
+  console.log(editor.getHTML()); // '<p><br></p>'
+  console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
+  console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
+
+    //   '<tr>'+
+    //     '<td>Emil</td>'+
+    //     '<td>Tobias</td>'+
+    //     '<td>Linus</td>'+
+    //   '</tr>'+
     // '</table>'
     //     '<ul>'+
     //   '<li>Coffee</li>'+
     //   '<li>Tea</li>'+
     //   '<li>Milk</li>'+
     // '</ul>'
-    )
+    // )
 
   // editor.setHTML(
   //   '<ul>'+
@@ -161,7 +255,7 @@
         <button
           class="toolbar-button material-icons"
           class:active={active.header === 2}
-          on:click={commands.header2}>title</button>
+          on:click={commands.bulletList}>title</button>
     
         <button
           class="toolbar-button material-icons header3"
@@ -188,10 +282,14 @@
           disabled={!active.redo}
           on:click={commands.redo}>redo</button>
         
-        <!-- <button
+        <button
             class="toolbar-button material-icons"
             class:active={active.italic}
-            on:click={test}>?</button> -->
+            on:click={test}>?</button>
+
+        <button
+            class="toolbar-button material-icons"
+            on:click={commands.addTest}>!</button>
         </div>
 
 

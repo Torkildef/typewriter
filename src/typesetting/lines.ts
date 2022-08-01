@@ -49,7 +49,6 @@ export const list = line({
     indent: () => editor.indent(),
     outdent: () => editor.outdent(),
     toggleCheck: (id: string) => {
-      console.log("hey1111111")
       const line = typeof id === 'string'
         ? editor.doc.getLineBy(id)
         : editor.doc.selection
@@ -225,10 +224,17 @@ export const hr = line({
 
 export const tableTest = line({
   name: 'table',
-  selector: 'table, td, table th, tr',
+  selector: 'td, table th, tr',
+  commands: editor => (
+    {
+    addTest: () =>  editor.toggleLineFormat({ table: 'root' }),
+  }),
 
   fromDom(node: HTMLElement) {
-    console.log(node.nodeName)
+    console.log(node)
+
+
+
     if(node.nodeName == "TD"){
       return {table: 'footer'};
     }
@@ -243,6 +249,7 @@ export const tableTest = line({
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lines, editor, forHTML) => {
+    console.log(lines)
       const first = lines[0][0].table;
       let row = h('tr', { key: first });
       const table = h('table', null, [ ]);
@@ -251,7 +258,6 @@ export const tableTest = line({
         const [ attributes, children, id ] = lines[i];
         if (attributes.table === 'row') {
           row = h('tr', { key: attributes.table });
-          console.log("pushing")
           table.children.push(row);
         }
         else if(attributes.table === 'footer'){
@@ -261,6 +267,7 @@ export const tableTest = line({
           row.children.push(h('th', { key: id }, children));
         }
       }
+      console.log(table)
       return table;
     },
 });

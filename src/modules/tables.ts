@@ -1,34 +1,35 @@
 import Editor, { EditorChangeEvent } from '../Editor';
+import { Delta } from 'typewriter-editor';
 import { h } from '../rendering/vdom';
 import { LineData, LineType } from '../typesetting';
 
 
 
-const TableType: LineType = {
-  name: 'table',
-  selector: 'table td',
-  renderMultiple(lines: LineData[]) {
-    const first = lines[0][0].table;
-    let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
-    const table = h('table', null, [ row ]);
+// const TableType: LineType = {
+//   name: 'table',
+//   selector: 'table td',
+//   renderMultiple(lines: LineData[]) {
+//     const first = lines[0][0].table;
+//     let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
+//     const table = h('table', null, [ row ]);
 
-    for (let i = 0; i < lines.length; i++) {
-      const [ attributes, children, id ] = lines[i];
-      if (row.key !== attributes.table) {
-        row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
-        table.children.push(row);
-      }
-      row.children.push(h('td', { key: id }));
-    }
+//     for (let i = 0; i < lines.length; i++) {
+//       const [ attributes, children, id ] = lines[i];
+//       if (row.key !== attributes.table) {
+//         row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
+//         table.children.push(row);
+//       }
+//       row.children.push(h('td', { key: id }));
+//     }
 
-    return table;
-  },
-};
+//     return table;
+//   },
+// };
 
 
 export function table(editor: Editor) {
 
-  editor.typeset.lines.add(TableType);
+  // editor.typeset.lines.add(TableType);
 
   function onChanging(event: EditorChangeEvent) {
     // If text was deleted from a table, prevent the row from being deleted unless the _whole_ row was deleted
@@ -37,11 +38,18 @@ export function table(editor: Editor) {
   }
 
   function insertTable(rows: number, columns: number) {
-    // editor.setHTML("<table><td>hey</td></table>")
-    // console.log("hey")
+    let scolumns = ''
+    for(let i = 0; i < columns; i++){
+      scolumns += '<td></td>'
+    }
 
-    editor.setHTML("<table>hey</table>", [1,2])
-    
+    let srow = ''
+    for(let i = 0; i < columns; i++){
+      srow += '<tr>' + scolumns + '</tr>'
+    }
+
+    let table = '<table>'+srow+'</table>'
+    editor.setHTML(table)
   }
 
   function addColumn(direction: -1 | 1) {
