@@ -1,5 +1,5 @@
 <script>
-    import { Delta, Editor } from 'typewriter-editor';
+    import { Delta, Editor, selection } from 'typewriter-editor';
     import Root from 'typewriter-editor/lib/Root.svelte';
     import Toolbar from 'typewriter-editor/lib/Toolbar.svelte';
     import { h, VNode } from 'typewriter-editor';
@@ -155,6 +155,14 @@
         //   editor.select(lastTD).insert(word, null)
         // }
       }
+
+      function addRow(){
+        editor.commands.addRow(1)
+      }
+      
+      function addColum(){
+        editor.commands.addColumn(1)
+      }
   
   editor.setHTML(
     'Table:' +
@@ -196,10 +204,10 @@
     '</tr>'+
     '</table>'
     )
-    console.log(editor.getText()); // '\n'
-  console.log(editor.getHTML()); // '<p><br></p>'
-  console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
-  console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
+  //   console.log(editor.getText()); // '\n'
+  // console.log(editor.getHTML()); // '<p><br></p>'
+  // console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
+  // console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
 
     //   '<tr>'+
     //     '<td>Emil</td>'+
@@ -229,12 +237,20 @@
     //     '<tr>Linus</tr>'+
     // '</table>')
   
-  console.log(editor.getText()); // '\n'
-  console.log(editor.getHTML()); // '<p><br></p>'
+  // console.log(editor.getText()); // '\n'
+  // console.log(editor.getHTML()); // '<p><br></p>'
   console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
   console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
 
-  console.log(editor.typeset.lines)
+  // console.log(editor.typeset.lines)
+
+  function inTest(){
+    console.log('her')
+    editor.insert("\n", {table: 'root'})
+    // let delta = new Delta()
+    // // editor.select(editor.doc.selection[0]).insert('hey', {list: 'bullet'})
+    // console.log(editor)
+  }
     </script>
 
 <table>
@@ -244,7 +260,7 @@
 </table>
     
     <div class="description">
-      <h1>Toolbar</h1>
+      <h1>Tabletesting</h1>
       <p>
         Create your own toolbar with the renderless Toolbar component.
       </p>
@@ -285,11 +301,19 @@
         <button
             class="toolbar-button material-icons"
             class:active={active.italic}
-            on:click={test}>?</button>
+            on:click={test}>table_chart</button>
+          <button
+          class="toolbar-button material-icons"
+          class:active={active.italic}
+          on:click={addColum}>C</button>
+          <button
+          class="toolbar-button material-icons"
+          class:active={active.italic}
+          on:click={addRow}>R</button>
 
         <button
             class="toolbar-button material-icons"
-            on:click={commands.addTest}>!</button>
+            on:click={inTest}>!</button>
         </div>
 
 

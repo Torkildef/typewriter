@@ -50,13 +50,62 @@ export function table(editor: Editor) {
 
     let table = '<table>'+srow+'</table>'
     editor.setHTML(table)
+
+    console.log(editor.doc)
   }
 
   function addColumn(direction: -1 | 1) {
 
-  }
+    let allHtml = editor.getHTML()
+    
+    let tableindexstart = allHtml.search('<table>')
+    let tableindexend = allHtml.search('</table>') + '</table>'.length
 
+    let htmlOver = allHtml.slice(0, tableindexstart)
+    let tableHtml = allHtml.slice(tableindexstart, tableindexend)
+    let htmlUnder = allHtml.slice(tableindexend)
+
+    let newCloumnHtml = '<td></td>'
+
+    let newTableHtml = tableHtml
+    for (let i = tableHtml.length; i > 5; i--) {
+      if (tableHtml.slice(i-5, i) === '</tr>') {
+        newTableHtml = newTableHtml.slice(0, i-5) + newCloumnHtml + newTableHtml.slice(i-5)
+      }
+    }
+
+    editor.setHTML(htmlOver + newTableHtml + htmlUnder)
+
+  }
+  
   function addRow(direction: -1 | 1) {
+
+    let allHtml = editor.getHTML()
+    
+    let tableindexstart = allHtml.search('<table>')
+    let tableindexend = allHtml.search('</table>') + '</table>'.length
+
+    let htmlOver = allHtml.slice(0, tableindexstart)
+    let tableHtml = allHtml.slice(tableindexstart, tableindexend)
+    let htmlUnder = allHtml.slice(tableindexend)
+    
+    let numberOfColumn = (tableHtml.match(/\/td/g) || [] ).length + (tableHtml.match(/\/th/g) || [] ).length
+    let numberOfRows = (tableHtml.match(/\/tr/g) || [] ).length
+    
+    let numberOfNewCells = numberOfColumn/numberOfRows
+    
+    let columhtml = ''
+    for(let i = 0; i < numberOfNewCells; i++){
+      columhtml += '<td></td>'
+    }
+
+    let srow = '<tr>' + columhtml + '</tr>'
+    
+    let lastRowIndex = tableHtml.lastIndexOf('</tr>') + '</tr>'.length
+
+    let newTableHtml = tableHtml.slice(0,lastRowIndex) + srow + tableHtml.slice(lastRowIndex)
+
+    editor.setHTML(htmlOver + newTableHtml + htmlUnder)
 
   }
 

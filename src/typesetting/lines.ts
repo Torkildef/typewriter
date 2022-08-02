@@ -231,9 +231,7 @@ export const tableTest = line({
   }),
 
   fromDom(node: HTMLElement) {
-    console.log(node)
-
-
+    // console.log(node)
 
     if(node.nodeName == "TD"){
       return {table: 'footer'};
@@ -249,7 +247,7 @@ export const tableTest = line({
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lines, editor, forHTML) => {
-    console.log(lines)
+    console.log('kommer hit')
       const first = lines[0][0].table;
       let row = h('tr', { key: first });
       const table = h('table', null, [ ]);
@@ -261,13 +259,13 @@ export const tableTest = line({
           table.children.push(row);
         }
         else if(attributes.table === 'footer'){
-          row.children.push(h('td', { key: id }, children));
+          row.children.push(h('td', { key: id, style: 'min-width: 50px;' }, children));
         }
         else if(attributes.table === 'header'){
-          row.children.push(h('th', { key: id }, children));
+          row.children.push(h('th', { key: id, style: 'min-width: 50px; background-color:lightgrey;'}, children));
         }
       }
-      console.log(table)
+      // console.log(table)
       return table;
     },
 });
