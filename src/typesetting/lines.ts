@@ -2,6 +2,7 @@ import { AttributeMap, Delta, normalizeRange } from '@typewriter/document';
 import { VNode, h, Props, VChild } from '../rendering/vdom';
 import { line } from './typeset';
 import { applyDecorations } from '../modules/decorations';
+import { children } from 'svelte/internal';
 
 
 export const paragraph = line({
@@ -224,48 +225,73 @@ export const hr = line({
 
 export const tableTest = line({
   name: 'table',
-  selector: 'td, table th, tr',
+  selector: 'td, th, tr',
   commands: editor => (
     {
     addTest: () =>  editor.toggleLineFormat({ table: 'root' }),
   }),
 
   fromDom(node: HTMLElement) {
-    // console.log(node)
+    console.log(node.nodeName)
+
+    // if(node.nodeName == "TABLE"){
+    //   let tableRows = node.getElementsByTagName("tr").length
+    //   let columns = (node.getElementsByTagName("td").length + node.getElementsByTagName("th").length)/ tableRows
+    //   return {table: 'root', rows: tableRows, columns: columns};
+    // }
+    if(node.nodeName == "TR"){
+      let columns = node.getElementsByTagName("td").length + node.getElementsByTagName("th").length
+      return {table:'row', columns: columns};
+    }
+    
+    if(node.nodeName == "TH"){
+      return {table: 'header'};
+    }
 
     if(node.nodeName == "TD"){
       return {table: 'footer'};
     }
 
-    if(node.nodeName == "TR"){
-      return {table:'row'};
-    }
 
-    if(node.nodeName == "TH"){
-      return {table: 'header'};
-    }
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lines, editor, forHTML) => {
-    console.log('kommer hit')
-      const first = lines[0][0].table;
-      let row = h('tr', { key: first });
-      const table = h('table', null, [ ]);
+    console.log(lines)
+    const table = h('table', null, []);
+    
+    for (let i = 0; i < lines.length; i++) {
+      const [ attributes, children, id ] = lines[i];
+
+      let row = h('tr', { key: attributes.table },);
+
+      
+    }
+
+    return table
+    // let row = h('tr', { key: 'row' });
+    // row.children.push(h('td', { style: 'min-width: 50px;' }, "hey"));
+    // row.children.push(h('td', { style: 'min-width: 50px;' }, "hey"));
+    // row.children.push(h('td', { style: 'min-width: 50px;' }, "hey"));
+    // const table = h('table', null, [row]);
+    // return table
+      // const first = lines[0][0].table;
+      // let row = h('tr', { key: first });
+      // const table = h('table', null, [ ]);
   
-      for (let i = 0; i < lines.length; i++) {
-        const [ attributes, children, id ] = lines[i];
-        if (attributes.table === 'row') {
-          row = h('tr', { key: attributes.table });
-          table.children.push(row);
-        }
-        else if(attributes.table === 'footer'){
-          row.children.push(h('td', { key: id, style: 'min-width: 50px;' }, children));
-        }
-        else if(attributes.table === 'header'){
-          row.children.push(h('th', { key: id, style: 'min-width: 50px; background-color:lightgrey;'}, children));
-        }
-      }
-      // console.log(table)
-      return table;
+      // for (let i = 0; i < lines.length; i++) {
+      //   const [ attributes, children, id ] = lines[i];
+      //   if (attributes.table === 'row') {
+      //     row = h('tr', { key: attributes.table });
+      //     table.children.push(row);
+      //   }
+      //   else if(attributes.table === 'footer'){
+      //     row.children.push(h('td', { key: id, style: 'min-width: 50px;' }, children));
+      //   }
+      //   else if(attributes.table === 'header'){
+      //     row.children.push(h('th', { key: id, style: 'min-width: 50px; background-color:lightgrey;'}, children));
+      //   }
+      // }
+      // // console.log(table)
+      // return table;
     },
 });

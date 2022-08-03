@@ -164,8 +164,12 @@
         editor.commands.addColumn(1)
       }
   
-  editor.setHTML(
-    'Table:' +
+  editor.setHTML('Table:'+
+            '<ul>'+
+      '<li>Coffee</li>'+
+      '<li>Tea</li>'+
+      '<li>Milk</li>'+
+    '</ul>'+
     '<table>'+
     '<tr>'+
     '<th>Person 1</th>'+
@@ -239,14 +243,41 @@
   
   // console.log(editor.getText()); // '\n'
   // console.log(editor.getHTML()); // '<p><br></p>'
+
   console.log(editor.getDelta()); // 'Delta( [{ insert: '\n' }] )'
   console.log(editor.doc); // 'TextDocument( [{ attributes: {}, content: [] }] )'  
 
   // console.log(editor.typeset.lines)
 
   function inTest(){
-    console.log('her')
-    editor.insert("\n", {table: 'root'})
+    editor.insert("\n", {table:'root'})
+
+//     console.log(editor.getActive())
+//     console.log('her')
+
+//     var delta = [{
+//   insert: {
+//     image: "https://imgur.com/"
+//   },
+//   attributes: {
+//     duration: 600
+//   }
+// }, {
+//   insert: "Hello",
+//   attributes: {
+//     alt: "Funny cat photo"
+//   }
+// }, {
+//   insert: {
+//     video: "https://youtube.com/"
+//   },
+//   attributes: {
+//     bold: true
+//   }
+// }];
+  
+//     editor.insert(delta)
+    // console.log(editor.getDelta())
     // let delta = new Delta()
     // // editor.select(editor.doc.selection[0]).insert('hey', {list: 'bullet'})
     // console.log(editor)
