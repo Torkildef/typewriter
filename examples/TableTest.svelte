@@ -164,7 +164,8 @@
         editor.commands.addColumn(1)
       }
   
-  editor.setHTML('Table:'+
+  editor.setHTML(
+    'Table:'+
             '<ul>'+
       '<li>Coffee</li>'+
       '<li>Tea</li>'+
@@ -250,7 +251,22 @@
   // console.log(editor.typeset.lines)
 
   function inTest(){
-    editor.insert("\n", {table:'root'})
+    let delta = new Delta(    [
+  { insert: '\n', attributes: {table:'row'} },
+  { insert: 'hey'},
+  { insert: '\n', attributes: {table:'footer'} },
+  { insert: 'hey'},
+  { insert: '\n', attributes: {table:'footer'} },
+  { insert: 'hey'},
+  { insert: '\n', attributes: {table:'footer'} },
+
+])
+
+    editor.insertContent(delta)
+    // editor.insert("\n", {table:'root'})
+    // editor.insert("\n", {table:'row'})
+    // editor.insert("\n", {table:'row'})
+    // editor.insert("\n", {table:'row'})
 
 //     console.log(editor.getActive())
 //     console.log('her')
@@ -336,11 +352,21 @@
           <button
           class="toolbar-button material-icons"
           class:active={active.italic}
-          on:click={addColum}>C</button>
+          on:click={commands.addColumnRight}>CR</button>
           <button
           class="toolbar-button material-icons"
           class:active={active.italic}
-          on:click={addRow}>R</button>
+          on:click={commands.addColumnLeft}>CL</button>
+          
+          <button
+          class="toolbar-button material-icons"
+          class:active={active.italic}
+          on:click={commands.addRowAbove}>RA</button>
+
+          <button
+          class="toolbar-button material-icons"
+          class:active={active.italic}
+          on:click={commands.addRowBelow}>RB</button>
 
         <button
             class="toolbar-button material-icons"

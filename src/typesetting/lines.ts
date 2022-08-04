@@ -3,6 +3,7 @@ import { VNode, h, Props, VChild } from '../rendering/vdom';
 import { line } from './typeset';
 import { applyDecorations } from '../modules/decorations';
 import { children } from 'svelte/internal';
+import { table } from '../modules/tables';
 
 
 export const paragraph = line({
@@ -225,14 +226,13 @@ export const hr = line({
 
 export const tableTest = line({
   name: 'table',
-  selector: 'td, th, tr',
+  selector: 'table, td, th, tr',
   commands: editor => (
     {
     addTest: () =>  editor.toggleLineFormat({ table: 'root' }),
   }),
 
   fromDom(node: HTMLElement) {
-    console.log(node.nodeName)
 
     // if(node.nodeName == "TABLE"){
     //   let tableRows = node.getElementsByTagName("tr").length
@@ -241,33 +241,48 @@ export const tableTest = line({
     // }
     if(node.nodeName == "TR"){
       let columns = node.getElementsByTagName("td").length + node.getElementsByTagName("th").length
-      return {table:'row', columns: columns};
+      return {table:'row', columns: columns, parent: node.parentNode?.parentNode};
     }
     
     if(node.nodeName == "TH"){
-      return {table: 'header'};
+      return {table: 'header', parent: node.parentNode, tableRoot: node.parentNode?.parentNode?.parentNode};
     }
 
     if(node.nodeName == "TD"){
-      return {table: 'footer'};
+      return {table: 'footer', parent: node.parentNode, tableRoot: node.parentNode?.parentNode?.parentNode};
     }
 
 
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   renderMultiple: (lines, editor, forHTML) => {
-    console.log(lines)
-    const table = h('table', null, []);
-    
+
+    const table1 = h('table', null, []);
+
+    let numberOfRows = lines.filter((element)=> element[0].table === 'row').length
+
+    let row;
+
     for (let i = 0; i < lines.length; i++) {
       const [ attributes, children, id ] = lines[i];
 
-      let row = h('tr', { key: attributes.table },);
+      if(attributes.table == 'row'){
+        row = h('tr', { key: id });
+        table1.children.push(row)
+      }
 
+      else if(attributes.table === 'footer'){
+        row.children.push(h('td', { key: id, style: 'min-width: 50px;' }, children));
+      }
       
+      else if(attributes.table === 'header'){
+        row.children.push(h('th', { key: id, style: 'min-width: 50px; background-color:lightgrey;' }, children));
+      }
+
     }
 
-    return table
+    return table1;
+    // return table
     // let row = h('tr', { key: 'row' });
     // row.children.push(h('td', { style: 'min-width: 50px;' }, "hey"));
     // row.children.push(h('td', { style: 'min-width: 50px;' }, "hey"));
@@ -291,7 +306,7 @@ export const tableTest = line({
       //     row.children.push(h('th', { key: id, style: 'min-width: 50px; background-color:lightgrey;'}, children));
       //   }
       // }
-      // // console.log(table)
+      // console.log(table)
       // return table;
     },
 });
