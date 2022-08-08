@@ -2,6 +2,7 @@ import Editor, { EditorChangeEvent } from '../Editor';
 import { Delta } from 'typewriter-editor';
 import { h } from '../rendering/vdom';
 import { LineData, LineType } from '../typesetting';
+import { start } from '@popperjs/core';
 
 
 
@@ -35,6 +36,7 @@ export function table(editor: Editor) {
   editor.on('change', onChanging);
 
   function onChanging(event: EditorChangeEvent) {
+    console.log(editor.doc.getLineAt(editor.doc.selection[0]))
 
     // If text was deleted from a table, prevent the row from being deleted unless the _whole_ row was deleted
     // If text in a column was deleted, delete the whole column or none of it
@@ -74,34 +76,74 @@ export function table(editor: Editor) {
 
   function addColumn(direction: -1 | 1) {
 
-    if(editor.getActive().table && editor.doc.selection){
-      let index = editor.doc.selection[0]
-      //Getting start of table
-      while(editor.doc.getLineAt(index)){
-        if(editor.doc.getLineAt(index).attributes.table){
-          index--
-        }
-        else{
-          break
-        }
-      }
-      index++
+    let newColumnPlacement = editor.doc.getLineAt(editor.doc.selection[0]).attributes.colNum
+    console.log(newColumnPlacement)
 
-      console.log(editor.doc.getLineAt(index))
-      if(direction == -1){
-        while(editor.doc.getLineAt(index)){
-          console.log(-1)
-          if(editor.doc.getLineAt(index).attributes.table){
-            if(editor.doc.getLineAt(index).attributes.table === 'row'){
-              editor.select(index).insert( '\n', {table:'footer'})
-            }
-          }
-          else{
-            break
-          }
-          index ++ 
-        }
+    let index = getTableIndexStart()
+    if (index == null) return null
+
+    let line = editor.doc.getLineAt(index)
+    while(line){
+      console.log(line, line.length)
+      console.log(editor.doc.getLineAt(index + line.length), line.length-1)
+
+      if(line.attributes.colNum === newColumnPlacement+1){
+        line.attributes.colNum++
+        index--
+        editor.insert('\n', {table:'footer', colNum:newColumnPlacement+1, rowNum:line.attributes.rowNum}, [index, index])
+        index+=2
       }
+
+      else if(line.attributes.colNum > newColumnPlacement){
+        line.attributes.colNum++
+      }
+
+      index += 1
+      line = editor.doc.getLineAt(index)
+    }
+
+    // if(editor.getActive().table && editor.doc.selection){
+    //   let index = editor.doc.selection[0]
+    //   //Getting start of table
+    //   while(editor.doc.getLineAt(index)){
+    //     if(editor.doc.getLineAt(index).attributes.table){
+    //       index--
+    //     }
+    //     else{
+    //       break
+    //     }
+    //   }
+    // }
+    //   index++
+
+      // while(editor.doc.getLineAt(index)){
+      //   console.log(-1)
+      //   if(editor.doc.getLineAt(index).attributes.table){
+      //     if(editor.doc.getLineAt(index).attributes.table === 'row'){
+      //       editor.select(index).insert( '\n', {table:'footer'})
+      //     }
+      //   }
+      //   else{
+      //     break
+      //   }
+      //   index ++ 
+      // }
+
+      // console.log(editor.doc.getLineAt(index))
+      // if(direction == -1){
+      //   while(editor.doc.getLineAt(index)){
+      //     console.log(-1)
+      //     if(editor.doc.getLineAt(index).attributes.table){
+      //       if(editor.doc.getLineAt(index).attributes.table === 'row'){
+      //         editor.select(index).insert( '\n', {table:'footer'})
+      //       }
+      //     }
+      //     else{
+      //       break
+      //     }
+      //     index ++ 
+      //   }
+      // }
 
       //Evig while
       // if(direction == 1){
@@ -174,7 +216,7 @@ export function table(editor: Editor) {
 
 
       
-    }
+
 
     // if(editor.getActive().table && editor.doc.selection){
     //   let newColumnPlacement = editor.doc.selection[0]
@@ -245,29 +287,111 @@ export function table(editor: Editor) {
   }
   
   function addRow(direction: -1 | 1) {
-    if(editor.getActive().table && editor.doc.selection){
-      let newRowPlacement = editor.doc.selection[0]
 
-      let columns = 0
-      while(editor.doc.getLineAt(newRowPlacement)){
-        if(editor.doc.getLineAt(newRowPlacement).attributes.table){
-
-          if(editor.doc.getLineAt(newRowPlacement).attributes.table === 'row'){
-            columns = editor.doc.getLineAt(newRowPlacement).attributes.columns
-            break
-          }
-          newRowPlacement += direction
-        }
-      }
-
-      let delta = new Delta([])
-      let row = { insert: '\n', attributes: {table:'row', columns:columns}}
-      delta.push(row)
-      for(let i = 0; i < row.attributes.columns; i++){
-        delta.push({ insert: '\n', attributes: {table:'footer'} })
-      }
+    let newColumnPlacement = getLastIndexInCurrentRow()
+    if(direction==-1){
+      newColumnPlacement = getFirstIndexInCurrentRow()
+    }
+    if(newColumnPlacement == null) return null;
       
-      editor.select(newRowPlacement).insertContent(delta)
+    let delta = new Delta([])
+    for(let i = 0; i < getTableColumnsLength(); i++){
+      delta.push({ insert: '\n', attributes: {table:'footer', colNum: i, rowNum:7} })
+    }
+
+    editor.select(newColumnPlacement).insertContent(delta)
+
+
+    // if(editor.getActive().table && editor.doc.selection){
+    //   let currentPlacement = editor.doc.selection[0]
+
+    //   while(editor.doc.getLineAt(currentPlacement)){
+    //     if(editor.doc.getLineAt(currentPlacement).attributes.colNum == 0){
+    //       break
+    //     }
+    //     currentPlacement += direction
+    //   }
+
+      // let columns = 0
+      // while(editor.doc.getLineAt(newRowPlacement)){
+      //   if(editor.doc.getLineAt(newRowPlacement).attributes.table){
+
+      //     if(editor.doc.getLineAt(newRowPlacement).attributes.table === 'row'){
+      //       columns = editor.doc.getLineAt(newRowPlacement).attributes.columns
+      //       break
+      //     }
+      //     newRowPlacement += direction
+      //   }
+      // }
+
+      // let delta = new Delta([])
+      // let row = { insert: '\n', attributes: {table:'row', columns:columns}}
+      // delta.push(row)
+      // for(let i = 0; i < row.attributes.columns; i++){
+      //   delta.push({ insert: '\n', attributes: {table:'footer'} })
+      // }
+
+    // if(editor.getActive().table && editor.doc.selection){
+    //   let currentPlacement = editor.doc.selection[0]
+    //   while(editor.doc.getLineAt(currentPlacement)){
+
+    //   }
+
+
+      // console.log(editor.doc.getFormats(newRowPlacement))
+
+      // let columns = 0
+
+      // while(editor.doc.getLineAt(newRowPlacement)){
+      //   if(editor.doc.getLineAt(newRowPlacement).attributes.table){
+      //     if(direction === -1){
+      //       if(editor.doc.getLineAt(newRowPlacement).attributes.lastInColumn){
+      //         newRowPlacement += 1
+      //         break
+      //       }
+      //     }
+
+      //     else if(editor.doc.getLineAt(newRowPlacement).attributes.firstInColumn){
+      //       break
+      //     }
+      //   }
+      //   newRowPlacement += direction
+      // }
+      
+
+      // let delta = new Delta([])
+      // delta.push({ insert: '\n', attributes: {table:'footer', firstRow: false, lastRow:false, firstInColumn: true, lastInColumn: false,} })
+      // for(let i = 0; i < 3; i++){
+      //   delta.push({ insert: '\n', attributes: {table:'footer', firstRow: false, lastRow:false, firstInColumn: false, lastInColumn: false,} })
+      // }
+      // delta.push({ insert: '\n', attributes: {table:'footer', firstRow: false, lastRow:false, firstInColumn: false, lastInColumn: true,} })
+      // editor.select(newRowPlacement).insertContent(delta)
+
+      // console.log(editor.getDelta())
+    //Før row ble tatt bort som delta
+    // if(editor.getActive().table && editor.doc.selection){
+    //   let newRowPlacement = editor.doc.selection[0]
+
+    //   let columns = 0
+    //   while(editor.doc.getLineAt(newRowPlacement)){
+    //     if(editor.doc.getLineAt(newRowPlacement).attributes.table){
+
+    //       if(editor.doc.getLineAt(newRowPlacement).attributes.table === 'row'){
+    //         columns = editor.doc.getLineAt(newRowPlacement).attributes.columns
+    //         break
+    //       }
+    //       newRowPlacement += direction
+    //     }
+    //   }
+
+      // let delta = new Delta([])
+      // let row = { insert: '\n', attributes: {table:'row', columns:columns}}
+      // delta.push(row)
+      // for(let i = 0; i < row.attributes.columns; i++){
+      //   delta.push({ insert: '\n', attributes: {table:'footer'} })
+      // }
+
+      // editor.select(newRowPlacement).insertContent(delta)
 
       
       // editor.select(newRowPlacement).insert('\n', {table:'row'} )
@@ -310,7 +434,7 @@ export function table(editor: Editor) {
 
     // editor.setHTML(htmlOver + newTableHtml + htmlUnder)
 
-  }
+  // }
 
   function deleteTable() {
 
@@ -323,6 +447,101 @@ export function table(editor: Editor) {
   function deleteRow() {
 
   }
+
+  function tableActive(at? : number){
+    if(!at){
+      return editor.getActive().table && editor.doc.selection?[0] : false
+    }
+
+    return editor.doc.getLineFormat(at).table && editor.doc.selection?[0] : false
+  }
+
+  function getTableIndexStart(){
+    if(tableActive()){
+      let currentIndex = editor.doc.selection!![0]
+
+      while(editor.doc.getLineAt(currentIndex)){
+        if(!editor.doc.getLineAt(currentIndex).attributes.table){
+          return currentIndex
+        }
+        currentIndex--
+      }
+    }
+    return null
+  }
+
+  function getTableLineStart(){
+    if(tableActive()){
+      let currentIndex = editor.doc.selection!![0]
+
+      while(editor.doc.getLineAt(currentIndex)){
+        if(!editor.doc.getLineAt(currentIndex).attributes.table){
+          return editor.doc.getLineAt(currentIndex+1)
+        }
+        currentIndex--
+      }
+      return editor.doc.getLineAt(currentIndex+1)
+    }
+    return null
+  }
+
+  function getTableRowsLength(){
+    let index = getTableIndexStart()
+    let maxNum = 0
+    if(index == null) return 0;
+      editor.doc.lines.filter(elm=>elm.attributes.table).forEach(elm=>{
+        if(elm.attributes.rowNum > maxNum)
+          maxNum = elm.attributes.rowNum
+      })
+
+      return maxNum + 1
+  }
+
+  function getTableColumnsLength(){
+    let index = getTableIndexStart()
+    let maxNum = 0
+    if(index == null) return 0;
+      editor.doc.lines.filter(elm=>elm.attributes.table).forEach(elm=>{
+        if(elm.attributes.colNum > maxNum)
+          maxNum = elm.attributes.colNum
+      })
+
+      return maxNum + 1
+  }
+
+  function getLastIndexInCurrentRow(){
+    if(tableActive()){
+      let currentIndex = editor.doc.selection!![0]
+
+      while(editor.doc.getLineAt(currentIndex)){
+        if(editor.doc.getLineAt(currentIndex).attributes.colNum === 0){
+          return currentIndex
+        }
+        currentIndex++
+      }
+    }
+    return null
+  }
+
+  function getFirstIndexInCurrentRow(){
+    if(tableActive()){
+      let currentIndex = editor.doc.selection!![0]
+      let currentRowNumber = editor.doc.getLineAt(currentIndex).attributes.rowNum
+
+      while(editor.doc.getLineAt(currentIndex)){
+        if(editor.doc.getLineAt(currentIndex).attributes.rowNum != currentRowNumber){
+          return currentIndex +1
+        }
+        currentIndex--
+      }
+    }
+    return null
+  }
+
+  function getCurrentColumNumber(){
+    return 
+  }
+
 
   const addColumnLeft = () => addColumn(-1);
   const addColumnRight = () => addColumn(1);

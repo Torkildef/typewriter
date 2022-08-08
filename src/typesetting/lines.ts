@@ -2,7 +2,7 @@ import { AttributeMap, Delta, normalizeRange } from '@typewriter/document';
 import { VNode, h, Props, VChild } from '../rendering/vdom';
 import { line } from './typeset';
 import { applyDecorations } from '../modules/decorations';
-import { children } from 'svelte/internal';
+import { children, HtmlTag } from 'svelte/internal';
 import { table } from '../modules/tables';
 
 
@@ -226,32 +226,57 @@ export const hr = line({
 
 export const tableTest = line({
   name: 'table',
-  selector: 'table, td, th, tr',
+  selector: 'table td, table th',
   commands: editor => (
     {
     addTest: () =>  editor.toggleLineFormat({ table: 'root' }),
   }),
 
-  fromDom(node: HTMLElement) {
+  fromDom(node: HTMLTableCellElement) {
+    console.log(node)
 
     // if(node.nodeName == "TABLE"){
-    //   let tableRows = node.getElementsByTagName("tr").length
-    //   let columns = (node.getElementsByTagName("td").length + node.getElementsByTagName("th").length)/ tableRows
-    //   return {table: 'root', rows: tableRows, columns: columns};
+    //   let nodeCount = 0;
+    //   console.log(node.firstChild)
+      
+    //   return null
+    //   // let tableRows = node.getElementsByTagName("tr").length
+    //   // let columns = (node.getElementsByTagName("td").length + node.getElementsByTagName("th").length)/ tableRows
+    //   // return {table: 'root', rows: tableRows, columns: columns};
     // }
-    if(node.nodeName == "TR"){
-      let columns = node.getElementsByTagName("td").length + node.getElementsByTagName("th").length
-      return {table:'row', columns: columns, parent: node.parentNode?.parentNode};
-    }
+    // let firstRow = node.parentNode?.firstChild === node
+    // let lastRow = node.parentNode?.lastChild === node
+    // let firstInColumn = node.previousSibling === null
+    // let lastInColumn = node.nextSibling === null
+
     
+
+    // // if(node.nodeName == "TR"){
+    // //   let columns = node.getElementsByTagName("td").length + node.getElementsByTagName("th").length
+    // //   return {table:'row', columns: columns, parent: node.parentNode?.parentNode, isFirst: first};
+    // // }
+    // // node.setAttribute("num", '2')
+    
+    // if(node.nodeName == "TH"){
+    //   return {table: 'header', firstRow: firstRow, lastRow:lastRow, firstInColumn: firstInColumn, lastInColumn: lastInColumn, };
+    // }
+
+    // if(node.nodeName == "TD"){
+    //   return {table: 'footer', firstRow: firstRow, lastRow:lastRow, firstInColumn: firstInColumn, lastInColumn: lastInColumn, };
+    // }
+
+
+    let colNum = node.cellIndex
+
+    let parentRow = node.parentNode as HTMLTableRowElement
+    parentRow.rowIndex
     if(node.nodeName == "TH"){
-      return {table: 'header', parent: node.parentNode, tableRoot: node.parentNode?.parentNode?.parentNode};
+      return {table: 'header', colNum: colNum, rowNum: parentRow.rowIndex };
     }
 
     if(node.nodeName == "TD"){
-      return {table: 'footer', parent: node.parentNode, tableRoot: node.parentNode?.parentNode?.parentNode};
+      return {table: 'footer', colNum: colNum, rowNum: parentRow.rowIndex };
     }
-
 
   },
   shouldCombine: (prev, next) => prev.list === next.list || next.indent,
@@ -266,12 +291,12 @@ export const tableTest = line({
     for (let i = 0; i < lines.length; i++) {
       const [ attributes, children, id ] = lines[i];
 
-      if(attributes.table == 'row'){
-        row = h('tr', { key: id });
+      if(attributes.colNum == 0){
+        row = h('tr', null);
         table1.children.push(row)
       }
 
-      else if(attributes.table === 'footer'){
+      if(attributes.table === 'footer'){
         row.children.push(h('td', { key: id, style: 'min-width: 50px;' }, children));
       }
       
