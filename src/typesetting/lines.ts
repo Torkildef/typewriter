@@ -218,3 +218,68 @@ export const hr = line({
   },
   render: () => h('hr'),
 });
+
+export const table = line({
+  name: 'table',
+  //Selector choose which tags that sholuld be included
+  selector: 'table td, table th',
+  commands: editor => (
+    {
+  }),
+
+  fromDom(node: HTMLTableCellElement) {
+
+    let colIndex = node.cellIndex
+
+    let parentRow = node.parentNode as HTMLTableRowElement
+
+    if(node.nodeName == "TH"){
+      return {table: 'header', colIndex: colIndex, rowIndex: parentRow.rowIndex };
+    }
+
+    if(node.nodeName == "TD"){
+      return {table: 'footer', colIndex: colIndex, rowIndex: parentRow.rowIndex };
+    }
+
+  },
+  //Dont known this yet
+  shouldCombine: (prev, next) => prev.list === next.list || next.indent,
+  renderMultiple: (lines, editor, forHTML) => {
+
+    //Creating the table root
+    const table = h('table', { style:'border-collapse: collapse;' }, []);
+
+    let row;
+
+    //Go throught all lines, either footer or headers
+    for (let i = 0; i < lines.length; i++) {
+      const [ attributes, children, id ] = lines[i];
+
+      //If the cell is first in row a row tag is added as parent 
+      if(attributes.colIndex == 0){
+        row = h('tr', null);
+        table.children.push(row)
+      }
+
+      let styleing = 
+      'min-width: 50px;'+
+      'border:1px solid black;'
+      
+      if(attributes.table === 'footer'){
+        row.children.push(h('td', { key: id, style: styleing }, children));
+      }
+      
+      else if(attributes.table === 'header'){
+        styleing += 
+        'background-color:lightgrey;' +
+        'border:1px solid black;'
+
+        row.children.push(h('th', { key: id, style: styleing }, children));
+      }
+
+    }
+
+    return table;
+    },
+});
+

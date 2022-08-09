@@ -6,5 +6,6 @@ import { selection } from './selection';
 import { paste } from './paste';
 import { copy } from './copy';
 import { history } from './history';
+import { table } from './tables'
 
-export const defaultModules = { keyboard, input, copy, paste, history, decorations, rendering, selection };
+export const defaultModules = { keyboard, input, copy, paste, history, decorations, rendering, selection, table };
