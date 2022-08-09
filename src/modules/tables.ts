@@ -47,13 +47,24 @@ export function table(editor: Editor) {
     let delta = new Delta([])
 
     for(let i = 0; i < rows; i++){
-      delta.push({ insert: '\n', attributes: {table:'row'} })
-      for(let i = 0; i < columns; i++){
-        delta.push({ insert: '\n', attributes: {table:'footer'} })
+      for(let j = 0; j < columns; j++){
+        delta.push({ insert: '\n', attributes: {table:'footer', colNum:j, rowNum:i} })
       }
     }
     
     editor.insertContent(delta)
+
+    //før
+    // let delta = new Delta([])
+
+    // for(let i = 0; i < rows; i++){
+    //   delta.push({ insert: '\n', attributes: {table:'row'} })
+    //   for(let i = 0; i < columns; i++){
+    //     delta.push({ insert: '\n', attributes: {table:'footer'} })
+    //   }
+    // }
+    
+    // editor.insertContent(delta)
 
 
     
