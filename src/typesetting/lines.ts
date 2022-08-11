@@ -244,6 +244,14 @@ export const table = line({
   },
   // //Dont known this yet
   // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
+  // contained: false,
+  // indentable:true,
+
+  nextLineAttributes(attributes) {
+    const { table, colIndex, rowIndex } = attributes;
+    let newColIndex = colIndex + 1
+    return {table, colIndex:newColIndex, rowIndex, newColumn:true};
+  },
   
   renderMultiple: (lines, editor, forHTML) => {
 
@@ -267,6 +275,8 @@ export const table = line({
       'border:1px solid black;'
       
       if(attributes.table === 'footer'){
+        styleing += 
+        'background-color:#f8f8f8;'
         row.children.push(h('td', { key: id, style: styleing }, children));
       }
       

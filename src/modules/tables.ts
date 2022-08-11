@@ -3,6 +3,7 @@ import { Delta } from 'typewriter-editor';
 
 import {getLineNodeEnd} from '../rendering/rendering'
 import { end } from '@popperjs/core';
+import { null_to_empty } from 'svelte/internal';
 
 
 //Added table implementation in typsetting/lines
@@ -39,7 +40,13 @@ export function table(editor: Editor) {
   editor.on('change', onChanging);
 
   function onChanging(event: EditorChangeEvent) {
-    console.log(editor.doc.getLineFormat(), editor.doc.selection)
+
+    //Possibility for detecting enter and backspacechanges
+    if(event.change?.contentChanged){
+      if(event.change.delta.ops.find(op=>op.attributes?.newColumn))return;
+    }
+
+    console.log(editor.doc.getLineFormat(), editor.doc.selection, tableActive())
     // If text was deleted from a table, prevent the row from being deleted unless the _whole_ row was deleted
     // If text in a column was deleted, delete the whole column or none of it
     // i.e. always ensure a table has all the cells needed to keep it correct
@@ -58,10 +65,25 @@ export function table(editor: Editor) {
 
   function addColumn(direction: -1 | 1) {
     let newColumnPlacement = editor.doc.getLineAt(editor.doc.selection[0]).attributes.colIndex
-
+    let columnLenght = getTableColumnsLength()
     if(direction == 1){
       newColumnPlacement++
+    
+      if(newColumnPlacement == columnLenght){
+        getTableLines().filter(line=>(line.attributes.colIndex == columnLenght -1)).forEach(line=>{
+          let insertPlace = editor.doc.getLineRange(line)[1]
+          let delta = new Delta([])
+          delta.push({ insert: '\n', attributes: {table:'footer', colIndex:newColumnPlacement, rowIndex:line.attributes.rowIndex} })
+
+          if(insertPlace == editor.doc.length){
+            editor.select(insertPlace).insert('\n')
+          }
+          editor.select(insertPlace).insertContent(delta)
+        })
+        return
+      }
     }
+
     getTableLines().forEach(line=>{
       if(line.attributes.colIndex == newColumnPlacement){
         line.attributes.colIndex ++
@@ -70,6 +92,7 @@ export function table(editor: Editor) {
         delta.push({ insert: '\n', attributes: {table:'footer', colIndex:newColumnPlacement, rowIndex:line.attributes.rowIndex} })
         editor.select(insertPlace[0]).insertContent(delta)
       }
+
       else if(line.attributes.colIndex > newColumnPlacement){
         line.attributes.colIndex ++
       }
@@ -123,11 +146,18 @@ export function table(editor: Editor) {
 
   //Extrafunctions for table
   function tableActive(at? : number){
-    if(!at){
-      return editor.getActive().table && editor.doc.selection?[0] : false
-    }
+    if(editor.doc.selection?[0]: false){
+      if(!at){
+        if(editor.getActive().table){
+          return true
+        }
+      }
 
-    return editor.doc.getLineFormat(at).table && editor.doc.selection?[0] : false
+      if(editor.doc.getLineFormat(at).table){
+        return true
+      }
+    }
+    return false
   }
 
   function getTableIndexStart(){
@@ -202,11 +232,10 @@ export function table(editor: Editor) {
 
     let tableIndexEnd = getTableIndexEnd()
 
-
-    return  editor.doc.lines.filter(line=>(
+    return editor.doc.lines.filter(line=>(
       editor.doc.getLineRange(line)[0] >= start!!
       &&
-      editor.doc.getLineRange(line)[1] <= tableIndexEnd!!
+      editor.doc.getLineRange(line)[0] <= tableIndexEnd!!
     ))
   }
 
