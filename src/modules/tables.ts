@@ -59,31 +59,24 @@ export function table(editor: Editor) {
   function addColumn(direction: -1 | 1) {
     let newColumnPlacement = editor.doc.getLineAt(editor.doc.selection[0]).attributes.colIndex
 
-    let index = getTableIndexStart()
-    if (index == null) return null
-
-    let line = editor.doc.getLineAt(index)
-    while(line){
-      if(line.attributes.colIndex === newColumnPlacement+1){
-        line.attributes.colIndex++
-        index--
-        editor.insert('\n', {table:'footer', colIndex:newColumnPlacement+1, rowIndex:line.attributes.rowIndex}, [index, index])
-        index+=2
-      }
-
-      else if(line.attributes.colIndex > newColumnPlacement){
-        line.attributes.colIndex++
-      }
-
-      index += 1
-      line = editor.doc.getLineAt(index)
+    if(direction == 1){
+      newColumnPlacement++
     }
-
+    getTableLines().forEach(line=>{
+      if(line.attributes.colIndex == newColumnPlacement){
+        line.attributes.colIndex ++
+        let insertPlace = editor.doc.getLineRange(line)
+        let delta = new Delta([])
+        delta.push({ insert: '\n', attributes: {table:'footer', colIndex:newColumnPlacement, rowIndex:line.attributes.rowIndex} })
+        editor.select(insertPlace[0]).insertContent(delta)
+      }
+      else if(line.attributes.colIndex > newColumnPlacement){
+        line.attributes.colIndex ++
+      }
+    })
   }
 
   function addRow(direction: -1 | 1) {
-    let tableIndexStart = getTableIndexStart()
-    let tableIndexEnd = getTableIndexEnd()
 
     let newRowIndex = editor.doc.getLineFormat().rowIndex +1
     let newColumnPlacement = getFirsIndexInNextRow()

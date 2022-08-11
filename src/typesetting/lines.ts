@@ -242,8 +242,9 @@ export const table = line({
     }
 
   },
-  //Dont known this yet
-  shouldCombine: (prev, next) => prev.list === next.list || next.indent,
+  // //Dont known this yet
+  // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
+  
   renderMultiple: (lines, editor, forHTML) => {
 
     //Creating the table root
