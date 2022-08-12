@@ -1,37 +1,41 @@
 import Editor, { EditorChangeEvent } from '../Editor';
-import { Delta } from 'typewriter-editor';
-
-import {getLineNodeEnd} from '../rendering/rendering'
-import { end } from '@popperjs/core';
-import { null_to_empty } from 'svelte/internal';
+import { Delta, Line, LineData, options } from 'typewriter-editor';
 
 
-//Added table implementation in typsetting/lines
+//---The implementation that was already started on
 
-// import { h } from '../rendering/vdom';
-// import { LineData, LineType } from '../typesetting';
+  //Added table implementation in typsetting/lines
+  // import { h } from '../rendering/vdom';
+  // import { LineData, LineType } from '../typesetting';
 
-// const TableType: LineType = {
-//   name: 'table',
-//   selector: 'table td',
-//   renderMultiple(lines: LineData[]) {
-//     const first = lines[0][0].table;
-//     let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
-//     const table = h('table', null, [ row ]);
+  // const TableType: LineType = {
+  //   name: 'table',
+  //   selector: 'table td',
+  //   renderMultiple(lines: LineData[]) {
+  //     const first = lines[0][0].table;
+  //     let row = h(first.startsWith('th-') ? 'th' : 'tr', { key: first });
+  //     const table = h('table', null, [ row ]);
 
-//     for (let i = 0; i < lines.length; i++) {
-//       const [ attributes, children, id ] = lines[i];
-//       if (row.key !== attributes.table) {
-//         row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
-//         table.children.push(row);
-//       }
-//       row.children.push(h('td', { key: id }));
-//     }
+  //     for (let i = 0; i < lines.length; i++) {
+  //       const [ attributes, children, id ] = lines[i];
+  //       if (row.key !== attributes.table) {
+  //         row = h(attributes.table.startsWith('th-') ? 'th' : 'tr', { key: attributes.table });
+  //         table.children.push(row);
+  //       }
+  //       row.children.push(h('td', { key: id }));
+  //     }
 
-//     return table;
-//   },
-// };
+  //     return table;
+  //   },
+  // };
+//---
 
+//Note
+//Some bugs where text could get in wrong cell
+//Using enter and backspase is not handled in right way and will causes bugs
+//-suggestion
+//  If possible, remove enter possebility when table is active
+//  The cells are noted with index attributes, might be simpler to remove and just mark first cell in row
 
 export function table(editor: Editor) {
 
@@ -45,15 +49,18 @@ export function table(editor: Editor) {
     if(event.change?.contentChanged){
       if(event.change.delta.ops.find(op=>op.attributes?.newColumn))return;
     }
-
-    console.log(editor.doc.getLineFormat(), editor.doc.selection, tableActive())
     // If text was deleted from a table, prevent the row from being deleted unless the _whole_ row was deleted
     // If text in a column was deleted, delete the whole column or none of it
     // i.e. always ensure a table has all the cells needed to keep it correct
   }
 
   function insertTable(rows: number, columns: number) {
+    //Prevent new column inside current column
+    if(tableActive())return;
+
     let delta = new Delta([])
+    
+    //The first operation is a new line to prevent text on current line to get inn to the table
     delta.push({ insert: '\n'})
     for(let i = 0; i < rows; i++){
       for(let j = 0; j < columns; j++){
@@ -64,11 +71,15 @@ export function table(editor: Editor) {
   }
 
   function addColumn(direction: -1 | 1) {
-    let newColumnPlacement = editor.doc.getLineAt(editor.doc.selection[0]).attributes.colIndex
+    if(!tableActive())return;
+
+    let newColumnPlacement = editor.doc.getLineAt(editor.doc.selection!![0]).attributes.colIndex
     let columnLenght = getTableColumnsLength()
+    //For columns right
     if(direction == 1){
       newColumnPlacement++
-    
+
+      //For new columns right for table end 
       if(newColumnPlacement == columnLenght){
         getTableLines().filter(line=>(line.attributes.colIndex == columnLenght -1)).forEach(line=>{
           let insertPlace = editor.doc.getLineRange(line)[1]
@@ -84,13 +95,14 @@ export function table(editor: Editor) {
       }
     }
 
+    
     getTableLines().forEach(line=>{
       if(line.attributes.colIndex == newColumnPlacement){
         line.attributes.colIndex ++
-        let insertPlace = editor.doc.getLineRange(line)
+        let insertPlace = editor.doc.getLineRange(line)[0]
         let delta = new Delta([])
         delta.push({ insert: '\n', attributes: {table:'footer', colIndex:newColumnPlacement, rowIndex:line.attributes.rowIndex} })
-        editor.select(insertPlace[0]).insertContent(delta)
+        editor.select(insertPlace).insertContent(delta)
       }
 
       else if(line.attributes.colIndex > newColumnPlacement){
@@ -100,10 +112,10 @@ export function table(editor: Editor) {
   }
 
   function addRow(direction: -1 | 1) {
+    if(!tableActive())return;
 
     let newRowIndex = editor.doc.getLineFormat().rowIndex +1
     let newColumnPlacement = getFirsIndexInNextRow()
-
     let numberOfColumns = getTableColumnsLength()
 
     if(direction==-1){
@@ -132,19 +144,63 @@ export function table(editor: Editor) {
   }
 
   function deleteTable() {
+    if(!tableActive())return;
+    editor.delete([getTableIndexStart()!!, getTableIndexEnd()!!])
+    editor.formatLine({})
 
   }
 
   function deleteColumn() {
+    if(!tableActive())return;
+
+    let columnLines = getCurrentColumnLines()
+
+    let columnIndex = editor.doc.getFormats().colIndex
+    columnLines.forEach(line=>{
+
+      //Have not figured out yet, but colums yet: Last column has to be deleted with a different value (-1)
+      if(columnIndex == getTableColumnsLength()-1){
+        editor.delete([editor.doc.getLineRange(line)[0]-1, editor.doc.getLineRange(line)[1]-1])
+      }
+      else{
+        editor.delete([editor.doc.getLineRange(line)[0], editor.doc.getLineRange(line)[1]])
+      }
+    })
+
+    //Updates new colIndex attribute
+    getTableLines().forEach(line=>{
+      if(line.attributes.colIndex > columnIndex){
+        line.attributes.colIndex --
+      }
+    })
 
   }
 
   function deleteRow() {
+    if(!tableActive())return;
 
+    let rowLines = getCurrentRowLines()
+    let rowIndex = editor.doc.getFormats().rowIndex
+
+    //Updates new rowIndex attribute
+    getTableLines().forEach(line=>{
+      if(line.attributes.rowIndex > rowIndex){
+        line.attributes.rowIndex --
+      }
+    })
+
+    rowLines.forEach(line=>{
+      editor.delete([editor.doc.getLineRange(line)[0]-1, editor.doc.getLineRange(line)[1]-1])
+      if((line.attributes.rowIndex == 0) && (line.attributes.colIndex == 0)){
+        editor.formatLine({})
+      }
+    })
   }
 
 
-  //Extrafunctions for table
+  //Exstrafunctions for table
+
+  /**Ensure the cursur is in a table*/
   function tableActive(at? : number){
     if(editor.doc.selection?[0]: false){
       if(!at){
@@ -160,68 +216,27 @@ export function table(editor: Editor) {
     return false
   }
 
+  /**Returns the index of the tables start*/
   function getTableIndexStart(){
-    if(tableActive()){
-      let currentIndex = editor.doc.selection!![0]
-      while(editor.doc.getFormats(currentIndex).table){
-        currentIndex--
-      }
-      return currentIndex +1
+    let currentIndex = editor.doc.selection!![0]
+    while(editor.doc.getFormats(currentIndex).table){
+      currentIndex--
     }
-    return null
+    return currentIndex +1
   }
 
+  /**Returns the index of the tables end*/
   function getTableIndexEnd(){
-    if(tableActive()){
-      let currentIndex = editor.doc.selection!![0]
-      while(editor.doc.getFormats(currentIndex).table){
-        currentIndex++
-      }
-      return currentIndex-1
+    let currentIndex = editor.doc.selection!![0]
+    while(editor.doc.getFormats(currentIndex).table){
+      currentIndex++
     }
-    return null
+    return currentIndex-1
   }
-
-  function getTableLineStart(){
-    if(tableActive()){
-      let currentIndex = editor.doc.selection!![0]
-
-      while(editor.doc.getLineAt(currentIndex)){
-        if(!editor.doc.getLineAt(currentIndex).attributes.table){
-          return editor.doc.getLineAt(currentIndex+1)
-        }
-        currentIndex--
-      }
-      return editor.doc.getLineAt(currentIndex+1)
-    }
-    return null
-  }
-
-  function getTableRowsLength(){
-    let index = getTableIndexStart()
-    let maxNum = 0
-    if(index == null) return 0;
-      getTableLines().forEach(elm=>{
-        if(elm.attributes.rowIndex > maxNum)
-          maxNum = elm.attributes.rowIndex
-      })
-
-      return maxNum + 1
-  }
-
-  function getTableColumnsLength(){
-    let index = getTableIndexStart()
-    let maxNum = 0
-    if(index == null) return 0;
-      editor.doc.lines.filter(elm=>elm.attributes.table).forEach(elm=>{
-        if(elm.attributes.colIndex > maxNum)
-          maxNum = elm.attributes.colIndex
-      })
-
-      return maxNum + 1
-  }
-
-  function getTableLines(from?){
+  
+  /**Returns the lines in the current table form index to index, defualt all*/
+  function getTableLines(from?, to?){
+    
     let start
     if(!from){
       start = getTableIndexStart()
@@ -230,32 +245,62 @@ export function table(editor: Editor) {
       start = from
     }
 
-    let tableIndexEnd = getTableIndexEnd()
+    let tableIndexEnd
+    if(!to){
+      tableIndexEnd = getTableIndexEnd() 
+    }
+    else{
+      tableIndexEnd = to
+    }
 
     return editor.doc.lines.filter(line=>(
-      editor.doc.getLineRange(line)[0] >= start!!
+      editor.doc.getLineRange(line)[0] >= start
       &&
-      editor.doc.getLineRange(line)[0] <= tableIndexEnd!!
+      editor.doc.getLineRange(line)[1] <= tableIndexEnd +1
     ))
   }
-
-  function getFirsIndexInNextRow(){
-    if(tableActive()){
-      let currentIndex = editor.doc.getLineRange(editor.doc.selection!![0])[1]
-
-      while(editor.doc.getFormats(currentIndex).colIndex != null){
-        if(editor.doc.getFormats(currentIndex).colIndex === 0){
-          return currentIndex
-        }
-        currentIndex++
-      }
-      return currentIndex
-    }
-    return null
+  
+  /**Returns first line in current table*/
+  function getTableLineStart(){
+    editor.doc.getLineAt(getTableIndexStart()!!)
   }
 
+  /**Returns the maximum found number of rows*/
+  function getTableRowsLength(){
+    let maxNumberOfRows = 0
+      getTableLines().forEach(line=>{
+        if(line.attributes.rowIndex > maxNumberOfRows)
+        maxNumberOfRows = line.attributes.rowIndex
+      })
+      return maxNumberOfRows + 1
+  }
+
+  /**Returns the maximum found number of colums*/
+  function getTableColumnsLength(){
+    let maxNumberOfColumns = 0
+    getTableLines().forEach(line=>{
+        if(line.attributes.colIndex > maxNumberOfColumns)
+        maxNumberOfColumns = line.attributes.colIndex
+      })
+
+      return maxNumberOfColumns + 1
+  }
+
+  /**Returns the first index in next row*/
+  function getFirsIndexInNextRow(){
+    let currentIndex = editor.doc.getLineRange(editor.doc.selection!![0])[1]
+    while(editor.doc.getFormats(currentIndex).colIndex != null){
+      if(editor.doc.getFormats(currentIndex).colIndex === 0){
+        return currentIndex
+      }
+      currentIndex++
+    }
+    return currentIndex
+  }
+
+  /**Returns the first index in current selected row, null if none*/
   function getFirstIndexInCurrentRow(){
-    if(tableActive()){
+    
       let currentIndex = editor.doc.selection!![0]
       let currentrowIndex = editor.doc.getLineAt(currentIndex).attributes.rowIndex
 
@@ -267,13 +312,32 @@ export function table(editor: Editor) {
       }
       //Table is in the start of the editor
       return currentIndex
-    }
-    return null
   }
 
-  function getCurrentColumNumber(){
-    return 
+  /**Returns the current column lines*/
+  function getCurrentColumnLines(){
+    let currentColumnNumber = editor.doc.getLineAt(editor.doc.selection!![0]).attributes.colIndex
+    let currentColumnLines : Line[] = []
+    getTableLines().forEach(line=>{
+      if(line.attributes.colIndex == currentColumnNumber)
+      currentColumnLines.push(line)
+    })
+
+    return currentColumnLines
   }
+
+  /**Returns the current row lines*/
+  function getCurrentRowLines(){
+    let currentRowNumber = editor.doc.getLineAt(editor.doc.selection!![0]).attributes.rowIndex
+    let currentColumnLines : Line[] = []
+    getTableLines().forEach(line=>{
+      if(line.attributes.rowIndex == currentRowNumber)
+      currentColumnLines.push(line)
+    })
+
+    return currentColumnLines
+  }
+
 
   const addColumnLeft = () => addColumn(-1);
   const addColumnRight = () => addColumn(1);

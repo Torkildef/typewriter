@@ -242,18 +242,27 @@ export const table = line({
     }
 
   },
+
   // //Dont known this yet
   // shouldCombine: (prev, next) => prev.list === next.list || next.indent,
   // contained: false,
   // indentable:true,
 
+  // defaultFollows: true,
+
   nextLineAttributes(attributes) {
     const { table, colIndex, rowIndex } = attributes;
-    let newColIndex = colIndex + 1
-    return {table, colIndex:newColIndex, rowIndex, newColumn:true};
+
+    //let new cell on same line
+    //let newColIndex = colIndex + 1
+
+    //let new cell start new line
+    let newColIndex = 0
+
+    return {table, colIndex:newColIndex, rowIndex};
   },
   
-  renderMultiple: (lines, editor, forHTML) => {
+  renderMultiple: (cells, editor, forHTML) => {
 
     //Creating the table root
     const table = h('table', { style:'border-collapse: collapse;' }, []);
@@ -261,8 +270,8 @@ export const table = line({
     let row;
 
     //Go throught all lines, either footer or headers
-    for (let i = 0; i < lines.length; i++) {
-      const [ attributes, children, id ] = lines[i];
+    for (let i = 0; i < cells.length; i++) {
+      const [ attributes, children, id ] = cells[i];
 
       //If the cell is first in row a row tag is added as parent 
       if(attributes.colIndex == 0){
@@ -287,10 +296,9 @@ export const table = line({
 
         row.children.push(h('th', { key: id, style: styleing }, children));
       }
-
     }
-
     return table;
+
     },
 });
 

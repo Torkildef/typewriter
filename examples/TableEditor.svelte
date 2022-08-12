@@ -1,56 +1,56 @@
 <script>
-    import { insert } from 'svelte/internal';
 import { Editor } from 'typewriter-editor';
-    import Root from 'typewriter-editor/lib/Root.svelte';
-    import Toolbar from 'typewriter-editor/lib/Toolbar.svelte';
+import Root from 'typewriter-editor/lib/Root.svelte';
+import Toolbar from 'typewriter-editor/lib/Toolbar.svelte';
     
-    const editor = window.editor = new Editor();
+const editor = window.editor = new Editor();
 
-    editor.setHTML(
-    '<table>'+
-    '<tr>'+
-    '<th>Person 1</th>'+
-    '<th>Person 2</th>'+
-    '<th>Person 3</th>'+
-    '<th>Person 4</th>'+
-    '<th>Person 5</th>'+
-    '</tr>'+
-    '<tr>'+
-    '<td>Emil</td>'+
-    '<td>Tobias</td>'+
-    '<td>Linus</td>'+
-    '<td>Bob</td>'+
-    '<td>Alice</td>'+
-    '</tr>'+
-    '<tr>'+
-    '<td>16</td>'+
-    '<td>14</td>'+
-    '<td>10</td>'+
-    '<td>40</td>'+
-    '<td>45</td>'+
-    '</tr>'+
-    '<tr>'+
-    '<td>16</td>'+
-    '<td>14</td>'+
-    '<td>10</td>'+
-    '<td>40</td>'+
-    '<td>45</td>'+
-    '</tr>'+
-    '<tr>'+
-    '<td>16</td>'+
-    '<td>14</td>'+
-    '<td>10</td>'+
-    '<td>40</td>'+
-    '<td>45</td>'+
-    '</tr>'+
-    '</table>'
-    )
+//Testdata
+editor.setHTML(
+'<table>'+
+'<tr>'+
+'<th>Person 1</th>'+
+'<th>Person 2</th>'+
+'<th>Person 3</th>'+
+'<th>Person 4</th>'+
+'<th>Person 5</th>'+
+'</tr>'+
+'<tr>'+
+'<td>Emil</td>'+
+'<td>Tobias</td>'+
+'<td>Linus</td>'+
+'<td>Bob</td>'+
+'<td>Alice</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
+'</tr>'+
+'<tr>'+
+'<td>16</td>'+
+'<td>14</td>'+
+'<td>10</td>'+
+'<td>40</td>'+
+'<td>45</td>'+
+'</tr>'+
+'</table>'
+)
 
-    function insertTable(){
-        let rows = prompt("Number of rows");
-        let colums = prompt("Number of columns");
-        editor.commands.insertTable(rows,colums)
-    }
+function insertTable(){
+    let rows = prompt("Number of rows");
+    let colums = prompt("Number of columns");
+    editor.commands.insertTable(rows,colums)
+}
 </script>
 
     
@@ -93,25 +93,48 @@ import { Editor } from 'typewriter-editor';
         <button
             class="toolbar-button material-icons"
             class:active={null}
+            title="Add new table"
             on:click={insertTable}>table_chart</button>
         <button
             class="toolbar-button material-icons"
             class:active={null}
+            title="Add column right"
             on:click={commands.addColumnRight}>CR</button>
         <button
             class="toolbar-button material-icons"
             class:active={null}
+            title="Add column left"
             on:click={commands.addColumnLeft}>CL</button>
             
         <button
             class="toolbar-button material-icons"
             class:active={null}
+            title="Add row above"
             on:click={commands.addRowAbove}>RA</button>
 
         <button
             class="toolbar-button material-icons"
+            title="Add row below"
             class:active={null}
             on:click={commands.addRowBelow}>RB</button>
+
+        <button
+            class="toolbar-button material-icons"
+            class:active={null}
+            title="Delete current table"
+            on:click={commands.deleteTable}>delete</button>
+
+            <button
+            class="toolbar-button material-icons"
+            class:active={null}
+            title="Delete current column"
+            on:click={commands.deleteColumn}>DC</button>
+
+            <button
+            class="toolbar-button material-icons"
+            class:active={null}
+            title="Delete current row"
+            on:click={commands.deleteRow}>DR</button>
 
         </div>
 
